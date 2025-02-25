@@ -69,6 +69,7 @@ export function UpProvider({ children }: UpProviderProps) {
   })();
 
   useEffect(() => {
+    console.log('eeee')
     let mounted = true;
 
     async function init() {
@@ -142,4 +143,4 @@ export function UpProvider({ children }: UpProviderProps) {
       </div>
     </UpContext.Provider>
   );
-} 
+}

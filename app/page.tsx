@@ -37,16 +37,22 @@ function MainContent() {
   }
 
   return (
-    <>
-      <div className={`${isSearching ? "hidden" : "block"}`}>
-        <Donate selectedAddress={selectedAddress} />
-      </div>
+    <a href="https://upassistants.com/lukso/catalog/executive-assistants/0x0c3dc7ea7521c79b99a667f2024d76714d33def2/configure" target="_blank" rel="noreferrer">
+    Install Tip Assistant
+  </a>
+  )
 
-      <div className={`${!isSearching ? "hidden" : "block"}`}>
-        <ProfileSearch onSelectAddress={setSelectedAddress} />
-      </div>
-    </>
-  );
+  // return (
+  //   <>
+  //     <div className={`${isSearching ? "hidden" : "block"}`}>
+  //       {/* <Donate selectedAddress={selectedAddress} /> */}
+  //     </div>
+  
+  //     <div className={`${!isSearching ? "hidden" : "block"}`}>
+  //       <ProfileSearch onSelectAddress={setSelectedAddress} />
+  //     </div>
+  //   </>
+  // );
 }
 
 /**
