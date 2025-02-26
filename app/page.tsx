@@ -183,11 +183,18 @@ function MainContent() {
       setMounted(true);
     });
   }, []);
+  
+  useEffect(() => {
+    const c = client
+    const a = accounts
+    const ca = contextAccounts
+    const wc = walletConnected
+    debugger;
+  }, [client, accounts, contextAccounts, walletConnected])
 
 
   useEffect(() => {
     console.log('initial');
-    debugger;
     if  (!client || !walletConnected)  return;
     console.log('connected')
     const loadExistingConfig = async () => {
@@ -234,7 +241,7 @@ function MainContent() {
       <div>
         <h1>Connect your wallet</h1>
         <p>
-          To start using the Tip Assistant, you need to connect your wallet.
+          To start using the XXX, you need to connect your wallet.
         </p>
       </div>
     );
