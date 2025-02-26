@@ -1,16 +1,73 @@
 "use client";
 
 import { UpProvider } from "@/components/upProvider";
-import { Donate } from "@/components/Donate";
-import { ProfileSearch } from "@/components/ProfileSearch";
 import { useUpProvider } from "@/components/upProvider";
 import { useState, useEffect } from "react";
 import { ERC725__factory } from '@/types';
+import {  ethers, AbiCoder } from 'ethers';
+import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
 if (typeof window !== "undefined") {
   promise = import("@lukso/web-components");
+}
+
+export const UNIVERSAL_TIP_ASSISTANT_ADDRESS = '0x0c3dc7ea7521c79b99a667f2024d76714d33def2';
+
+export const TIP_ASSISTANT_CONFIG = [
+  {
+    name: 'tipAddress',
+    type: 'address',
+    hidden: false,
+    description: 'The address you want to tip:',
+    placeholder: 'Enter destination address',
+    validationMessage: 'Tip address cannot be your own address',
+    validate: (value: any, upAddress: string) => {
+      return value.toLowerCase() !== upAddress.toLowerCase();
+    },
+  },
+  {
+    name: 'tipAmount',
+    type: 'uint256',
+    defaultValue: '2',
+    hidden: false,
+    description: 'Percentage of LYX to tip:',
+    placeholder: 'e.g 10',
+    validate: (value: any) => {
+      const number = parseInt(value);
+      return number > 0 && number <= 100 && value.indexOf('.') === -1;
+    },
+    validationMessage:
+      'Tip amount must be between 1 and 100 without decimals',
+  },
+];
+
+export const generateMappingKey = (keyName: string, typeId: string): string => {
+  const hashedKey = ethers.keccak256(ethers.toUtf8Bytes(keyName));
+  const first10Bytes = hashedKey.slice(2, 22);
+  const last20Bytes = typeId.slice(2, 42);
+  return '0x' + first10Bytes + '0000' + last20Bytes;
+};
+
+// Function to decode the encoded addresses
+export function customDecodeAddresses(encoded: string): string[] {
+  // Remove "0x" prefix for easier handling
+  const data = encoded.startsWith('0x') ? encoded.substring(2) : encoded;
+
+  // Decode the number of addresses (first 4 characters represent 2 bytes)
+  const numAddressesHex = data.substring(0, 4);
+  const numAddresses = parseInt(numAddressesHex, 16);
+
+  // Extract each 20-byte address
+  let addresses: string[] = [];
+  for (let i = 0; i < numAddresses; i++) {
+    const startIdx = 4 + i * 40; // 4 hex chars for length, then 40 hex chars per address (20 bytes)
+    const addressHex = `0x${data.substring(startIdx, startIdx + 40)}`;
+    addresses.push(ethers.getAddress(addressHex)); // Normalize address
+  }
+
+  return addresses;
 }
 
 interface IFullAssistantConfig {
@@ -118,6 +175,7 @@ function MainContent() {
   const { client, accounts, contextAccounts, walletConnected } =
     useUpProvider();
   const [isLoading, setIsLoading] = useState(false);
+  const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] = useState(false);
 
   useEffect(() => {
     // Load web component here if needed
@@ -128,46 +186,44 @@ function MainContent() {
 
 
   useEffect(() => {
+    console.log('initial');
+    debugger;
     if  (!client || !walletConnected)  return;
-
+    console.log('connected')
     const loadExistingConfig = async () => {
       try {
         setIsLoading(true);
-        const signer = await getSigner();
+        const signer = client.getSigner();
+
+        const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
+          name,
+          type,
+        }));
 
         const { selectedConfigTypes, isUPSubscribedToAssistant, fieldValues } =
           await fetchAssistantConfig({
-            upAddress: address,
-            assistantAddress,
-            supportedTransactionTypes: assistantSupportedTransactionTypes,
+            upAddress: accounts[0],
+            assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
+            supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
             configParams,
             signer,
           });
 
-        setSelectedConfigTypes(selectedConfigTypes);
         setIsUPSubscribedToAssistant(isUPSubscribedToAssistant);
-        if(fieldValues) {
-          setFieldValues(fieldValues);
-        }
+        console.log('finish usereffects')
       } catch (err) {
         console.error('Failed to load existing config:', err);
       } finally {
-        setIsProcessingTransaction(false);
+        setIsLoading(false);
       }
     };
 
     loadExistingConfig();
   }, [
-    address,
-    assistantAddress,
-    assistantSupportedTransactionTypes,
-    configParams,
-    getSigner,
+    accounts,
+    client,
+    walletConnected
   ]);
-
-
-
-  const { selectedAddress, setSelectedAddress, isSearching } = useUpProvider();
 
   if (!mounted) {
     return null; // or a loading placeholder
