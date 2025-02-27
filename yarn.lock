@@ -900,10 +900,10 @@
     "@lukso/lsp3-contracts" "~0.15.0"
     "@openzeppelin/contracts" "^4.9.3"
 
-"@lukso/up-provider@^0.3.2":
-  version "0.3.4"
-  resolved "https://registry.npmjs.org/@lukso/up-provider/-/up-provider-0.3.4.tgz"
-  integrity sha512-pugYc3+/Ey8QUIhFUCRSgJrN1iDpgs860+j0hj1P/sm2P25eotxtjPD4B063hm1k15Cx7+mtS7MeLw47ZDBO2Q==
+"@lukso/up-provider@0.3.1":
+  version "0.3.1"
+  resolved "https://registry.npmjs.org/@lukso/up-provider/-/up-provider-0.3.1.tgz"
+  integrity sha512-sDwROYTp16FTpwp85I4l7Lf1yDDM6PzLs6mEuJ0P5Sy3MYqN0iT8/28KX+zRKQbsF17R7dGX+VJq9gZyFv8tTQ==
   dependencies:
     "@mixer/postmessage-rpc" "^1.1.4"
     "@types/debug" "^4.1.12"
