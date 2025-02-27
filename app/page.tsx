@@ -235,6 +235,7 @@ function MainContent() {
   if (!mounted) {
     return null; // or a loading placeholder
   }
+  
 
   if (!client || !walletConnected) {
     return (
