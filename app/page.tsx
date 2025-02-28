@@ -82,15 +82,16 @@ async function fetchAssistantConfig({
   assistantAddress,
   supportedTransactionTypes,
   configParams,
-  signer,
+  client,
 }: {
   upAddress: string;
   assistantAddress: string;
   supportedTransactionTypes: string[];
   configParams: { name: string; type: string }[];
-  signer: any; // e.g. ethers.Signer
+  client: any;
 }): Promise<IFullAssistantConfig> {
-  const upContract = ERC725__factory.connect(upAddress, signer);
+  const signer = await client.getSigner();
+  const upContract = ERC725__factory.connect(upAddress, signer); // todo it is not the up address it is the page address
 
   // Build the keys for each supported transaction type.
   const assistantTypesConfigKeys = supportedTransactionTypes.map(id =>
@@ -102,11 +103,16 @@ async function fetchAssistantConfig({
     'UAPExecutiveConfig',
     assistantAddress
   );
-
+  console.log("Keys:", [
+    ...assistantTypesConfigKeys,
+    assistantConfigKey,
+  ]); // Show the keys you pass
+  debugger;
   const configData = await upContract.getDataBatch([
     ...assistantTypesConfigKeys,
     assistantConfigKey,
   ]);
+  console.log("Result:", configData); // Show the keys you pass
 
   // The first N items in configData will be for type configurations
   const typeConfigValues = configData.slice(
@@ -184,23 +190,18 @@ function MainContent() {
     });
   }, []);
   
-  useEffect(() => {
-    const c = client
-    const a = accounts
-    const ca = contextAccounts
-    const wc = walletConnected
-    debugger;
-  }, [client, accounts, contextAccounts, walletConnected])
-
 
   useEffect(() => {
     console.log('initial');
     if  (!client || !walletConnected)  return;
     console.log('connected')
+    console.log('accounts', accounts)
+    console.log('client', client)
+    console.log('walletConnected', walletConnected)
+    console.log('contextAccounts', contextAccounts)
     const loadExistingConfig = async () => {
       try {
         setIsLoading(true);
-        const signer = client.getSigner();
 
         const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
           name,
@@ -209,11 +210,11 @@ function MainContent() {
 
         const { selectedConfigTypes, isUPSubscribedToAssistant, fieldValues } =
           await fetchAssistantConfig({
-            upAddress: accounts[0],
+            upAddress: contextAccounts[0],
             assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
             supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
             configParams,
-            signer,
+            client,
           });
 
         setIsUPSubscribedToAssistant(isUPSubscribedToAssistant);
@@ -235,7 +236,7 @@ function MainContent() {
   if (!mounted) {
     return null; // or a loading placeholder
   }
-  
+
 
   if (!client || !walletConnected) {
     return (
