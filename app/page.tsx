@@ -5,7 +5,12 @@ import { useUpProvider } from "@/components/upProvider";
 import { useState, useEffect } from "react";
 import { ERC725__factory } from '@/types';
 import {  ethers, AbiCoder } from 'ethers';
-import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import { ERC725YDataKeys, LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json';
+import { BrowserProvider } from "ethers";
+import { Eip1193Provider } from "ethers";
+import { createClientUPProvider } from "@lukso/up-provider";
+import { TipProfile } from "@/components/TipProfile";
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -83,35 +88,48 @@ async function fetchAssistantConfig({
   supportedTransactionTypes,
   configParams,
   client,
+  provider
 }: {
   upAddress: string;
   assistantAddress: string;
   supportedTransactionTypes: string[];
   configParams: { name: string; type: string }[];
   client: any;
-}): Promise<IFullAssistantConfig> {
-  const signer = await client.getSigner();
-  const upContract = ERC725__factory.connect(upAddress, signer); // todo it is not the up address it is the page address
+  provider: BrowserProvider;
+}): Promise<IFullAssistantConfig 
+| null> {
 
-  // Build the keys for each supported transaction type.
-  const assistantTypesConfigKeys = supportedTransactionTypes.map(id =>
-    generateMappingKey('UAPTypeConfig', id)
-  );
+  // const UPContract = new ethers.Contract(
+  //   upAddress,
+  //   UniversalProfile.abi,
+  //   provider
+  // );
+  
+  // const UPURD = await UPContract.getData(
+  //   // ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegate
+  //   "0x0cfc51aec37c55a4d0b1a65c6255c4bf2fbdf6277f3cc0730c45b828b6db8b47"
+  // );
+
+  // console.log('UPURD', UPURD)
+
+  // const signer = await client.getSigner();
+  const upProvider = createClientUPProvider();
+
+  const browserProvider = new ethers.BrowserProvider(upProvider as unknown as Eip1193Provider)
+
+
+  // console.log('signer', signer)
+  const upContract = ERC725__factory.connect('0x291adFfb41456d589137eA2A009A6D797DB97468', browserProvider); // todo it is not the up address it is the page address
 
   // Assistant's config key
   const assistantConfigKey = generateMappingKey(
     'UAPExecutiveConfig',
     assistantAddress
   );
-  console.log("Keys:", [
-    ...assistantTypesConfigKeys,
+  const params = [
     assistantConfigKey,
-  ]); // Show the keys you pass
-  debugger;
-  const configData = await upContract.getDataBatch([
-    ...assistantTypesConfigKeys,
-    assistantConfigKey,
-  ]);
+  ]
+  const configData = await upContract.getDataBatch(params);
   console.log("Result:", configData); // Show the keys you pass
 
   // The first N items in configData will be for type configurations
@@ -178,7 +196,7 @@ async function fetchAssistantConfig({
  */
 function MainContent() {
   const [mounted, setMounted] = useState(false);
-  const { client, accounts, contextAccounts, walletConnected } =
+  const { provider, client, accounts, contextAccounts, walletConnected } =
     useUpProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] = useState(false);
@@ -208,16 +226,15 @@ function MainContent() {
           type,
         }));
 
-        const { selectedConfigTypes, isUPSubscribedToAssistant, fieldValues } =
-          await fetchAssistantConfig({
-            upAddress: contextAccounts[0],
-            assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
-            supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
-            configParams,
-            client,
-          });
-
-        setIsUPSubscribedToAssistant(isUPSubscribedToAssistant);
+        // const assistantResponse = await fetchAssistantConfig({
+        //     upAddress: contextAccounts[0],
+        //     assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
+        //     supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+        //     configParams,
+        //     client,
+        //     provider
+        //   });
+        setIsUPSubscribedToAssistant(true);
         console.log('finish usereffects')
       } catch (err) {
         console.error('Failed to load existing config:', err);
@@ -249,23 +266,18 @@ function MainContent() {
     );
   }
 
-  return (
-    <a href="https://upassistants.com/lukso/catalog/executive-assistants/0x0c3dc7ea7521c79b99a667f2024d76714d33def2/configure" target="_blank" rel="noreferrer">
-    Install Tip Assistant
-  </a>
-  )
 
-  // return (
-  //   <>
-  //     <div className={`${isSearching ? "hidden" : "block"}`}>
-  //       {/* <Donate selectedAddress={selectedAddress} /> */}
-  //     </div>
-  
-  //     <div className={`${!isSearching ? "hidden" : "block"}`}>
-  //       <ProfileSearch onSelectAddress={setSelectedAddress} />
-  //     </div>
-  //   </>
-  // );
+  return (
+    <>
+      <div className={`${isUPSubscribedToAssistant ? "hidden" : "block"}`}>
+        Configure
+      </div>
+    
+      <div className={`${!isUPSubscribedToAssistant ? "hidden" : "block"}`}>
+      <TipProfile destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'} /> 
+      </div>
+    </>
+  );
 }
 
 /**

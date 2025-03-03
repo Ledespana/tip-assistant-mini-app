@@ -38,7 +38,7 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
         profileAddress: string;
         isLoading: boolean;
     }>({
-        imgUrl: 'https://tools-web-components.pages.dev/images/sample-avatar.jpg',
+        imgUrl: 'https://tools-web-components.pages.dev/images/sample-avatar.jpg', // todo change default files
         fullName: 'username',
         background: 'https://tools-web-components.pages.dev/images/sample-background.jpg',
         profileAddress: '0x1234567890111213141516171819202122232425',
@@ -53,7 +53,7 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
 
             try {
                 const config = { ipfsGateway: IPFS_GATEWAY };
-                const rpcEndpoint = chainId === 42 ? RPC_ENDPOINT_MAINNET : RPC_ENDPOINT_TESTNET;
+                const rpcEndpoint = chainId === 42 || chainId.toString() === '42' ? RPC_ENDPOINT_MAINNET : RPC_ENDPOINT_TESTNET; // fix types
                 const profile = new ERC725(erc725schema, address, rpcEndpoint, config);
                 const fetchedData = await profile.fetchData('LSP3Profile');
 
@@ -65,8 +65,7 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
                     const profileImagesIPFS = fetchedData.value.LSP3Profile.profileImage;
                     const fullName = fetchedData.value.LSP3Profile.name;
                     const profileBackground = fetchedData.value.LSP3Profile.backgroundImage;
-
-                    setProfileData({
+                    const data = {
                         fullName: fullName || '',
                         imgUrl: profileImagesIPFS?.[0]?.url
                             ? profileImagesIPFS[0].url.replace('ipfs://', IPFS_GATEWAY)
@@ -76,7 +75,8 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
                             : '',
                         profileAddress: address,
                         isLoading: false,
-                    });
+                    }
+                    setProfileData(data);
                 }
             } catch (error) {
                 console.error('Error fetching profile image:', error);
