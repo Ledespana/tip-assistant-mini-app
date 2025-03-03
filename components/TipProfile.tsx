@@ -50,7 +50,11 @@ export function TipProfile({ destinationAddress }: TipProfileProps) {
   };
 
   return (
-
+    <div>
+        <div>
+            Continuously Tipping
+        </div>
         <LuksoProfile address={destinationAddress} />
+    </div>
   );
 }

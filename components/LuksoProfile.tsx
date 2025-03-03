@@ -110,14 +110,14 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
                         prefix="@"
                     ></lukso-username>
                 )}
-                <lukso-tooltip variant="dark" trigger="mouseenter" text="Change Profile" hide-on-click="true" show-delay="300" hide-delay="300" class="pl-60 pb-2">
+                <lukso-tooltip variant="dark" trigger="mouseenter" text="Tipping % for every entering LYX transaction" hide-on-click="true" show-delay="300" hide-delay="300" class="pl-60 pb-2">
                     <lukso-button
                         onClick={() => setIsSearching(true)}
                         variant="secondary"
                         size="small"
                         isIcon={true}
                     >
-                        <lukso-icon name="profile-recovery" size="small" color="neutral-20" class="pl-3 pr-3"></lukso-icon>
+                        1%
                     </lukso-button>
                 </lukso-tooltip>
             </div>
