@@ -275,6 +275,7 @@ function MainContent() {
     
       <div className={`${!isUPSubscribedToAssistant ? "hidden" : "block"}`}>
       <TipProfile destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'} /> 
+      <div>Power by UpAssistants</div>
       </div>
     </>
   );
