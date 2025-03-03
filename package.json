@@ -8,24 +8,29 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --write .",
     "typechain": "typechain --target ethers-v6 --out-dir types ./node_modules/@erc725/smart-contracts/artifacts/*.json"
   },
   "dependencies": {
-    "@erc725/erc725.js": "^0.27.2",
-    "@lukso/up-provider": "^0.3.2",
+    "@erc725/erc725.js": "^0.26.0",
+    "@lukso/lsp-smart-contracts": "^0.15.0",
+    "@lukso/up-provider": "0.3.1",
+    "ethers": "^6.13.5",
     "@lukso/web-components": "^1.104.0",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "ethereum-blockies-base64": "^1.0.2",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
+    "localtunnel": "^2.0.2",
     "next": "15.1.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "viem": "^2.21.54"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@erc725/smart-contracts": "^8.0.0",
     "@eslint/eslintrc": "^3",
+    "@typechain/ethers-v6": "^0.5.1",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -35,7 +40,8 @@
     "sass": "^1.83.1",
     "tailwindcss": "^3.4.1",
     "typechain": "^8.3.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "prettier": "^3.1.0"
   },
   "packageManager": "yarn@4.6.0"
 }

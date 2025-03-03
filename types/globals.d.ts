@@ -8,14 +8,14 @@ import React from 'react';
 
 /**
  * Generic type for LUKSO Web Components that enables React compatibility.
- * 
+ *
  * @template T - The type of the web component's properties
  * @description
  * This type allows LUKSO web components to be used within React applications by:
  * 1. Merging standard HTML element props with component-specific props
  * 2. Supporting React children and class name props
  * 3. Making all component props optional to maintain flexibility
- * 
+ *
  * @example
  * // Usage in JSX
  * <lukso-button variant="primary">Click me</lukso-button>
