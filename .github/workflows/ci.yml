@@ -33,7 +33,7 @@ jobs:
         id: extract_branch
 
       - uses: actions/checkout@v4 # Updated to the latest version
-      
+
       - uses: actions/setup-node@v3 # Latest version as of now
         with:
           node-version: '22.12.0'

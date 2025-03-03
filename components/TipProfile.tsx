@@ -5,8 +5,8 @@ import { useUpProvider } from './upProvider';
 /**
  * TipProfile Component
  *
- * Renders a card with the recipient’s profile (using LuksoProfile) 
- * and provides a simple input for specifying a tip amount. 
+ * Renders a card with the recipient’s profile (using LuksoProfile)
+ * and provides a simple input for specifying a tip amount.
  * Includes a button to trigger the tip/donation action.
  *
  * @component
@@ -33,7 +33,7 @@ export function TipProfile({ destinationAddress }: TipProfileProps) {
       }
       setIsSending(true);
 
-      // TODO: Implement your tipping logic here. 
+      // TODO: Implement your tipping logic here.
       // Example (pseudocode):
       // const signer = await client.getSigner();
       // await signer.sendTransaction({
@@ -51,10 +51,8 @@ export function TipProfile({ destinationAddress }: TipProfileProps) {
 
   return (
     <div>
-        <div>
-            Continuously Tipping
-        </div>
-        <LuksoProfile address={destinationAddress} />
+      <div>Continuously Tipping</div>
+      <LuksoProfile address={destinationAddress} />
     </div>
   );
 }

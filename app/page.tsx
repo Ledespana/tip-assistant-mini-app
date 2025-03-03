@@ -1,24 +1,25 @@
-"use client";
+'use client';
 
-import { UpProvider } from "@/components/upProvider";
-import { useUpProvider } from "@/components/upProvider";
-import { useState, useEffect } from "react";
+import { UpProvider } from '@/components/upProvider';
+import { useUpProvider } from '@/components/upProvider';
+import { useState, useEffect } from 'react';
 import { ERC725__factory } from '@/types';
-import {  ethers, AbiCoder } from 'ethers';
+import { ethers, AbiCoder } from 'ethers';
 import { ERC725YDataKeys, LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json';
-import { BrowserProvider } from "ethers";
-import { Eip1193Provider } from "ethers";
-import { createClientUPProvider } from "@lukso/up-provider";
-import { TipProfile } from "@/components/TipProfile";
+import { BrowserProvider } from 'ethers';
+import { Eip1193Provider } from 'ethers';
+import { createClientUPProvider } from '@lukso/up-provider';
+import { TipProfile } from '@/components/TipProfile';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
-if (typeof window !== "undefined") {
-  promise = import("@lukso/web-components");
+if (typeof window !== 'undefined') {
+  promise = import('@lukso/web-components');
 }
 
-export const UNIVERSAL_TIP_ASSISTANT_ADDRESS = '0x0c3dc7ea7521c79b99a667f2024d76714d33def2';
+export const UNIVERSAL_TIP_ASSISTANT_ADDRESS =
+  '0x0c3dc7ea7521c79b99a667f2024d76714d33def2';
 
 export const TIP_ASSISTANT_CONFIG = [
   {
@@ -43,8 +44,7 @@ export const TIP_ASSISTANT_CONFIG = [
       const number = parseInt(value);
       return number > 0 && number <= 100 && value.indexOf('.') === -1;
     },
-    validationMessage:
-      'Tip amount must be between 1 and 100 without decimals',
+    validationMessage: 'Tip amount must be between 1 and 100 without decimals',
   },
 ];
 
@@ -88,7 +88,7 @@ async function fetchAssistantConfig({
   supportedTransactionTypes,
   configParams,
   client,
-  provider
+  provider,
 }: {
   upAddress: string;
   assistantAddress: string;
@@ -96,15 +96,13 @@ async function fetchAssistantConfig({
   configParams: { name: string; type: string }[];
   client: any;
   provider: BrowserProvider;
-}): Promise<IFullAssistantConfig 
-| null> {
-
+}): Promise<IFullAssistantConfig | null> {
   // const UPContract = new ethers.Contract(
   //   upAddress,
   //   UniversalProfile.abi,
   //   provider
   // );
-  
+
   // const UPURD = await UPContract.getData(
   //   // ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegate
   //   "0x0cfc51aec37c55a4d0b1a65c6255c4bf2fbdf6277f3cc0730c45b828b6db8b47"
@@ -115,22 +113,24 @@ async function fetchAssistantConfig({
   // const signer = await client.getSigner();
   const upProvider = createClientUPProvider();
 
-  const browserProvider = new ethers.BrowserProvider(upProvider as unknown as Eip1193Provider)
-
+  const browserProvider = new ethers.BrowserProvider(
+    upProvider as unknown as Eip1193Provider
+  );
 
   // console.log('signer', signer)
-  const upContract = ERC725__factory.connect('0x291adFfb41456d589137eA2A009A6D797DB97468', browserProvider); // todo it is not the up address it is the page address
+  const upContract = ERC725__factory.connect(
+    '0x291adFfb41456d589137eA2A009A6D797DB97468',
+    browserProvider
+  ); // todo it is not the up address it is the page address
 
   // Assistant's config key
   const assistantConfigKey = generateMappingKey(
     'UAPExecutiveConfig',
     assistantAddress
   );
-  const params = [
-    assistantConfigKey,
-  ]
+  const params = [assistantConfigKey];
   const configData = await upContract.getDataBatch(params);
-  console.log("Result:", configData); // Show the keys you pass
+  console.log('Result:', configData); // Show the keys you pass
 
   // The first N items in configData will be for type configurations
   const typeConfigValues = configData.slice(
@@ -199,7 +199,8 @@ function MainContent() {
   const { provider, client, accounts, contextAccounts, walletConnected } =
     useUpProvider();
   const [isLoading, setIsLoading] = useState(false);
-  const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] = useState(false);
+  const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] =
+    useState(false);
 
   useEffect(() => {
     // Load web component here if needed
@@ -207,16 +208,15 @@ function MainContent() {
       setMounted(true);
     });
   }, []);
-  
 
   useEffect(() => {
     console.log('initial');
-    if  (!client || !walletConnected)  return;
-    console.log('connected')
-    console.log('accounts', accounts)
-    console.log('client', client)
-    console.log('walletConnected', walletConnected)
-    console.log('contextAccounts', contextAccounts)
+    if (!client || !walletConnected) return;
+    console.log('connected');
+    console.log('accounts', accounts);
+    console.log('client', client);
+    console.log('walletConnected', walletConnected);
+    console.log('contextAccounts', contextAccounts);
     const loadExistingConfig = async () => {
       try {
         setIsLoading(true);
@@ -235,7 +235,7 @@ function MainContent() {
         //     provider
         //   });
         setIsUPSubscribedToAssistant(true);
-        console.log('finish usereffects')
+        console.log('finish usereffects');
       } catch (err) {
         console.error('Failed to load existing config:', err);
       } finally {
@@ -244,38 +244,32 @@ function MainContent() {
     };
 
     loadExistingConfig();
-  }, [
-    accounts,
-    client,
-    walletConnected
-  ]);
+  }, [accounts, client, walletConnected]);
 
   if (!mounted) {
     return null; // or a loading placeholder
   }
 
-
   if (!client || !walletConnected) {
     return (
       <div>
         <h1>Connect your wallet</h1>
-        <p>
-          To start using the XXX, you need to connect your wallet.
-        </p>
+        <p>To start using the XXX, you need to connect your wallet.</p>
       </div>
     );
   }
 
-
   return (
     <>
-      <div className={`${isUPSubscribedToAssistant ? "hidden" : "block"}`}>
+      <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
         Configure
       </div>
-    
-      <div className={`${!isUPSubscribedToAssistant ? "hidden" : "block"}`}>
-      <TipProfile destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'} /> 
-      <div>Power by UpAssistants</div>
+
+      <div className={`${!isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
+        <TipProfile
+          destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'}
+        />
+        <div>Power by UpAssistants</div>
       </div>
     </>
   );

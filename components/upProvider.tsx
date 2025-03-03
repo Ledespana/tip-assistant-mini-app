@@ -1,7 +1,7 @@
 'use client';
 
-import { createClientUPProvider } from "@lukso/up-provider";
-import { BrowserProvider } from "ethers";
+import { createClientUPProvider } from '@lukso/up-provider';
+import { BrowserProvider } from 'ethers';
 import React, {
   createContext,
   useContext,
@@ -9,7 +9,7 @@ import React, {
   useState,
   useRef,
   ReactNode,
-} from "react";
+} from 'react';
 
 interface UpProviderContext {
   provider: any;
@@ -29,7 +29,7 @@ const UpContext = createContext<UpProviderContext | undefined>(undefined);
 export function useUpProvider() {
   const context = useContext(UpContext);
   if (!context) {
-    throw new Error("useUpProvider must be used within a UpProvider");
+    throw new Error('useUpProvider must be used within a UpProvider');
   }
   return context;
 }
@@ -39,14 +39,19 @@ interface UpProviderProps {
 }
 
 // Create the UP Provider once, if in the browser
-const upProvider = typeof window !== "undefined" ? createClientUPProvider() : null;
+const upProvider =
+  typeof window !== 'undefined' ? createClientUPProvider() : null;
 
 export function UpProvider({ children }: UpProviderProps) {
   const [chainId, setChainId] = useState<number>(0);
   const [accounts, setAccounts] = useState<Array<`0x${string}`>>([]);
-  const [contextAccounts, setContextAccounts] = useState<Array<`0x${string}`>>([]);
+  const [contextAccounts, setContextAccounts] = useState<Array<`0x${string}`>>(
+    []
+  );
   const [walletConnected, setWalletConnected] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<`0x${string}` | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<`0x${string}` | null>(
+    null
+  );
   const [isSearching, setIsSearching] = useState(false);
 
   // Create the Ethers client once from the UP provider (if present)
@@ -82,10 +87,12 @@ export function UpProvider({ children }: UpProviderProps) {
         const _contextAccounts = upProvider.contextAccounts || [];
         if (mounted) {
           setContextAccounts(_contextAccounts);
-          setWalletConnected(_accounts.length > 0 && _contextAccounts.length > 0);
+          setWalletConnected(
+            _accounts.length > 0 && _contextAccounts.length > 0
+          );
         }
       } catch (error) {
-        console.error("Init error:", error);
+        console.error('Init error:', error);
       }
     }
 
@@ -97,25 +104,30 @@ export function UpProvider({ children }: UpProviderProps) {
       setWalletConnected(_accounts.length > 0 && contextAccounts.length > 0);
     };
 
-    const handleContextAccountsChanged = (_contextAccounts: Array<`0x${string}`>) => {
+    const handleContextAccountsChanged = (
+      _contextAccounts: Array<`0x${string}`>
+    ) => {
       setContextAccounts(_contextAccounts);
       setWalletConnected(accounts.length > 0 && _contextAccounts.length > 0);
     };
 
     const handleChainChanged = (_chainId: number) => {
       // Only update if it actually changes
-      setChainId((prev) => (prev !== _chainId ? _chainId : prev));
+      setChainId(prev => (prev !== _chainId ? _chainId : prev));
     };
 
-    upProvider.on("accountsChanged", handleAccountsChanged);
-    upProvider.on("chainChanged", handleChainChanged);
-    upProvider.on("contextAccountsChanged", handleContextAccountsChanged);
+    upProvider.on('accountsChanged', handleAccountsChanged);
+    upProvider.on('chainChanged', handleChainChanged);
+    upProvider.on('contextAccountsChanged', handleContextAccountsChanged);
 
     return () => {
       mounted = false;
-      upProvider.removeListener("accountsChanged", handleAccountsChanged);
-      upProvider.removeListener("chainChanged", handleChainChanged);
-      upProvider.removeListener("contextAccountsChanged", handleContextAccountsChanged);
+      upProvider.removeListener('accountsChanged', handleAccountsChanged);
+      upProvider.removeListener('chainChanged', handleChainChanged);
+      upProvider.removeListener(
+        'contextAccountsChanged',
+        handleContextAccountsChanged
+      );
     };
   }, [client, upProvider, contextAccounts.length, accounts.length]);
 
