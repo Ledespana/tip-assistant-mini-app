@@ -11,6 +11,7 @@ import { BrowserProvider } from 'ethers';
 import { Eip1193Provider } from 'ethers';
 import { createClientUPProvider } from '@lukso/up-provider';
 import { TipProfile } from '@/components/TipProfile';
+import { NoAssistant } from '@/components/NoAssistant';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -234,7 +235,7 @@ function MainContent() {
         //     client,
         //     provider
         //   });
-        setIsUPSubscribedToAssistant(true);
+        setIsUPSubscribedToAssistant(false);
         console.log('finish usereffects');
       } catch (err) {
         console.error('Failed to load existing config:', err);
@@ -262,7 +263,7 @@ function MainContent() {
   return (
     <>
       <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
-        Configure
+        <NoAssistant />
       </div>
 
       <div className={`${!isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
