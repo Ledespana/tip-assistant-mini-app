@@ -12,6 +12,7 @@ import { Eip1193Provider } from 'ethers';
 import { createClientUPProvider } from '@lukso/up-provider';
 import { TipProfile } from '@/components/TipProfile';
 import { NoAssistant } from '@/components/NoAssistant';
+import PoweredByBanner from '@/components/PoweredBanner';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -235,7 +236,7 @@ function MainContent() {
         //     client,
         //     provider
         //   });
-        setIsUPSubscribedToAssistant(false);
+        setIsUPSubscribedToAssistant(true);
         console.log('finish usereffects');
       } catch (err) {
         console.error('Failed to load existing config:', err);
@@ -270,8 +271,8 @@ function MainContent() {
         <TipProfile
           destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'}
         />
-        <div>Power by UpAssistants</div>
-      </div>
+        <PoweredByBanner />
+        </div>
     </>
   );
 }

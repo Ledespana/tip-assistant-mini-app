@@ -38,7 +38,7 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
     profileAddress: string;
     isLoading: boolean;
   }>({
-    imgUrl: 'https://tools-web-components.pages.dev/images/sample-avatar.jpg', // todo change default files
+    imgUrl: 'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp', // todo change default files
     fullName: 'username',
     background:
       'https://tools-web-components.pages.dev/images/sample-background.jpg',
@@ -74,7 +74,7 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
             fullName: fullName || '',
             imgUrl: profileImagesIPFS?.[0]?.url
               ? profileImagesIPFS[0].url.replace('ipfs://', IPFS_GATEWAY)
-              : 'https://tools-web-components.pages.dev/images/sample-avatar.jpg',
+              : 'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp',
             background: profileBackground?.[0]?.url
               ? profileBackground[0].url.replace('ipfs://', IPFS_GATEWAY)
               : '',
@@ -133,40 +133,6 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
             1%
           </lukso-button>
         </lukso-tooltip>
-        <lukso-tooltip
-            variant="dark"
-            trigger="mouseenter"
-            text="Settings"
-            hide-on-click="true"
-            show-delay="300"
-            hide-delay="300"
-            >
-            <lukso-button
-                onClick={() => {
-                // Define your settings click handler here, e.g. open a settings modal
-                console.log('Settings clicked');
-                }}
-                variant="secondary"
-                size="small"
-                isIcon={true}
-            >
-                {/* Inline SVG gear icon */}
-                <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                >
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1z"></path>
-                </svg>
-            </lukso-button>
-            </lukso-tooltip>
       </div>
     </lukso-card>
   );
