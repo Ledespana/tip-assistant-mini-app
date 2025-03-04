@@ -1,5 +1,5 @@
 'use client';
-
+import { Provider } from "@/components/ui/provider";
 import { UpProvider } from '@/components/upProvider';
 import { useUpProvider } from '@/components/upProvider';
 import { useState, useEffect } from 'react';
@@ -286,7 +286,9 @@ function MainContent() {
 export default function Home() {
   return (
     <UpProvider>
-      <MainContent />
+      <Provider>
+        <MainContent />
+      </Provider>
     </UpProvider>
   );
 }
