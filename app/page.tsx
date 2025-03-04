@@ -264,15 +264,36 @@ function MainContent() {
   return (
     <>
       <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'PT Mono',
+          }}
+        >
+          Tip Assistant
+        </div>
         <NoAssistant />
+        <PoweredByBanner />
       </div>
 
       <div className={`${!isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'PT Mono',
+          }}
+        >
+          Tip Assistant
+        </div>
         <TipProfile
           destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'}
         />
         <PoweredByBanner />
-        </div>
+      </div>
     </>
   );
 }

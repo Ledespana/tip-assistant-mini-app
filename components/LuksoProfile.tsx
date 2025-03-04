@@ -38,7 +38,8 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
     profileAddress: string;
     isLoading: boolean;
   }>({
-    imgUrl: 'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp', // todo change default files
+    imgUrl:
+      'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp', // todo change default files
     fullName: 'username',
     background:
       'https://tools-web-components.pages.dev/images/sample-background.jpg',
@@ -115,24 +116,16 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
             prefix="@"
           ></lukso-username>
         )}
-        <lukso-tooltip
-          variant="dark"
-          trigger="mouseenter"
-          text="Tipping % for every entering LYX transaction"
-          hide-on-click="true"
-          show-delay="300"
-          hide-delay="300"
-          class="pl-60 pb-2"
+        <div
+          style={{
+            color: 'rgb(122 157 184)',
+            fontFamily: 'PT Mono',
+            lineHeight: '22px',
+          }}
         >
-          <lukso-button
-            onClick={() => setIsSearching(true)}
-            variant="secondary"
-            size="small"
-            isIcon={true}
-          >
-            1%
-          </lukso-button>
-        </lukso-tooltip>
+          {' '}
+          Continuously Tipping 1%
+        </div>
       </div>
     </lukso-card>
   );
