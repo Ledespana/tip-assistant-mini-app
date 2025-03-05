@@ -1,13 +1,19 @@
+import { customEncodeAddresses, generateMappingKey } from '@/app/utils';
+import { UNIVERSAL_TIP_ASSISTANT_ADDRESS } from '@/config';
+import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import { AbiCoder } from 'ethers';
 import { useEffect, useState } from 'react';
 
 function Settings({
   loadedDestinationAddress = '',
   loadedPercentageTipped = '',
+  loadedTypeConfigAddresses = [],
   onBack,
 }: {
   onBack: () => void;
   loadedDestinationAddress?: string; // Allow optional props
   loadedPercentageTipped?: string;
+  loadedTypeConfigAddresses?: string[];
 }) {
   const [destinationAddress, setDestinationAddress] = useState(
     loadedDestinationAddress || ''
@@ -20,7 +26,6 @@ function Settings({
   useEffect(() => {
     setDestinationAddress(loadedDestinationAddress || '');
     setTipPercentage(loadedPercentageTipped || '');
-    debugger;
   }, [loadedDestinationAddress, loadedPercentageTipped]);
 
   const validateTipPercentage = (value: string) => {
@@ -33,10 +38,70 @@ function Settings({
     return true;
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!validateTipPercentage(tipPercentage)) return;
-    console.log('Saved settings:', { destinationAddress, tipPercentage });
-    // Here you can save the settings (e.g., to state, a backend, or blockchain)
+
+    try {
+      //   setIsProcessingTransaction(true);
+
+      const updatedTypeConfigAddresses = { ...loadedTypeConfigAddresses };
+
+      // 2) Figure out if the type needs to be added
+      const dataKeys: string[] = [];
+      const dataValues: string[] = [];
+      const abiCoder = new AbiCoder();
+
+      // ==== TYPES ====
+      const assistantSupportedTransactionTypes = [
+        LSP1_TYPE_IDS.LSP0ValueReceived,
+      ];
+      assistantSupportedTransactionTypes.forEach(typeId => {
+        const currentTypeAddresses = [
+          ...(updatedTypeConfigAddresses[typeId] || []),
+        ];
+        const currentAssistantIndex = currentTypeAddresses.findIndex(
+          a => a.toLowerCase() === UNIVERSAL_TIP_ASSISTANT_ADDRESS.toLowerCase()
+        );
+        if (selectedConfigTypes.includes(typeId)) {
+          // todo when configuring for first time
+          if (currentAssistantIndex === -1) {
+            currentTypeAddresses.push(UNIVERSAL_TIP_ASSISTANT_ADDRESS);
+          }
+        } else {
+          // todo, in theory not possible on Tip assistant V1
+          if (currentAssistantIndex !== -1) {
+            currentTypeAddresses.splice(currentAssistantIndex, 1);
+          }
+        }
+
+        updatedTypeConfigAddresses[typeId] = currentTypeAddresses;
+        // 3) update types
+        const typeConfigKey = generateMappingKey('UAPTypeConfig', typeId);
+        if (currentTypeAddresses.length === 0) {
+          dataKeys.push(typeConfigKey);
+          dataValues.push('0x');
+        } else {
+          dataKeys.push(typeConfigKey);
+          dataValues.push(customEncodeAddresses(currentTypeAddresses));
+        }
+      });
+      // 4. % and destination fields
+
+      const assistantConfigKey = generateMappingKey(
+        'UAPExecutiveConfig',
+        UNIVERSAL_TIP_ASSISTANT_ADDRESS // todo handle mainnet/testnet
+      );
+      const types = ['address', 'uint256'];
+      const values = [destinationAddress, tipPercentage];
+      const assistantConfigValue = abiCoder.encode(types, values);
+      dataKeys.push(assistantConfigKey);
+      dataValues.push(assistantConfigValue);
+
+      const tx = await upContract.setDataBatch(dataKeys, dataValues);
+      await tx.wait();
+    } catch (error) {
+      console.error('Failed to save config:', error);
+    }
   };
 
   return (

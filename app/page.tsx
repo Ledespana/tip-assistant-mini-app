@@ -39,6 +39,7 @@ function MainContent() {
   const [shouldDisplaySettings, setShouldDisplaySettings] = useState(false);
   const [percentageTipped, setPercentageTipped] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
+  const [typeConfigAddresses, setTypeConfigAddresses] = useState([]);
 
   useEffect(() => {
     // Load web component here if needed
@@ -73,6 +74,11 @@ function MainContent() {
         ) {
           setPercentageTipped(assistantResponse.fieldValues.tipAmount);
           setDestinationAddress(assistantResponse.fieldValues.tipAddress);
+          setTypeConfigAddresses(assistantResponse.typeConfigAddresses);
+        } else {
+          setPercentageTipped('');
+          setDestinationAddress('');
+          setTypeConfigAddresses([]);
         }
       } catch (err) {
         console.error('Failed to load existing config:', err);
@@ -102,6 +108,7 @@ function MainContent() {
       <Settings
         loadedDestinationAddress={destinationAddress}
         loadedPercentageTipped={percentageTipped}
+        loadedTypeConfigAddresses={typeConfigAddresses}
         onBack={() => setShouldDisplaySettings(false)}
       />
     );
