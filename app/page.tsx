@@ -7,8 +7,10 @@ import { TipProfile } from '@/components/TipProfile';
 import { NoAssistant } from '@/components/NoAssistant';
 import PoweredByBanner from '@/components/PoweredBanner';
 import Settings from '@/components/Settings';
-import { TIP_ASSISTANT_CONFIG } from '@/config';
+import { TIP_ASSISTANT_CONFIG, UNIVERSAL_TIP_ASSISTANT_ADDRESS } from '@/config';
 import { LuksoProfile } from '@/components/LuksoProfile';
+import { fetchAssistantConfig } from './utils';
+import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -26,7 +28,7 @@ if (typeof window !== 'undefined') {
  */
 function MainContent() {
   const [mounted, setMounted] = useState(false);
-  const { provider, client, accounts, contextAccounts, walletConnected } =
+  const { publicClient, client, accounts, contextAccounts, walletConnected } =
     useUpProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] =
@@ -41,30 +43,22 @@ function MainContent() {
   }, []);
 
   useEffect(() => {
-    console.log('initial');
     if (!client || !walletConnected) return;
-    console.log('connected');
-    console.log('accounts', accounts);
-    console.log('client', client);
-    console.log('walletConnected', walletConnected);
-    console.log('contextAccounts', contextAccounts);
     const loadExistingConfig = async () => {
       try {
         setIsLoading(true);
-
         const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
           name,
           type,
         }));
 
-        // const assistantResponse = await fetchAssistantConfig({
-        //     upAddress: contextAccounts[0],
-        //     assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
-        //     supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
-        //     configParams,
-        //     client,
-        //     provider
-        //   });
+        const assistantResponse = await fetchAssistantConfig({
+            upAddress: contextAccounts[0],
+            assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
+            supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+            configParams,
+            publicClient,
+          });
         setIsUPSubscribedToAssistant(true);
         console.log('finish usereffects');
       } catch (err) {
@@ -75,7 +69,7 @@ function MainContent() {
     };
 
     loadExistingConfig();
-  }, [accounts, client, walletConnected]);
+  }, [accounts, publicClient, walletConnected]);
 
   if (!mounted) {
     return null; // or a loading placeholder
@@ -124,7 +118,7 @@ function MainContent() {
           Tip Assistant
         </div>
 
-              <LuksoProfile address={'0x291adFfb41456d589137eA2A009A6D797DB97468'} />
+        <LuksoProfile address={'0x291adFfb41456d589137eA2A009A6D797DB97468'} />
 
         <button
           style={{

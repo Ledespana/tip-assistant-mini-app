@@ -4,9 +4,6 @@ import { AbiCoder } from 'ethers';
 import { BrowserProvider } from 'ethers';
 import { ethers } from 'ethers';
 
-export const UNIVERSAL_TIP_ASSISTANT_ADDRESS =
-  '0x0c3dc7ea7521c79b99a667f2024d76714d33def2';
-
 export const TIP_ASSISTANT_CONFIG = [
   {
     name: 'tipAddress',
@@ -52,106 +49,83 @@ interface IFullAssistantConfig {
   fieldValues?: Record<string, string>;
 }
 
+const ERC725Y_ABI = [
+    {
+      type: "function",
+      name: "getDataBatch",
+      stateMutability: "view",
+      inputs: [{ type: "bytes32[]" }],
+      outputs: [{ type: "bytes[]" }],
+    },
+  ];
+
 export const fetchAssistantConfig = async function ({
-  upAddress,
-  assistantAddress,
-  supportedTransactionTypes,
-  configParams,
-  client,
-  provider,
-}: {
-  upAddress: string;
-  assistantAddress: string;
-  supportedTransactionTypes: string[];
-  configParams: { name: string; type: string }[];
-  client: any;
-  provider: BrowserProvider;
-}): Promise<IFullAssistantConfig | null> {
-  // const UPContract = new ethers.Contract(
-  //   upAddress,
-  //   UniversalProfile.abi,
-  //   provider
-  // );
+    upAddress,
+    assistantAddress,
+    supportedTransactionTypes,
+    configParams,
+    publicClient,
+  }: {
+    upAddress: string;
+    assistantAddress: string;
+    supportedTransactionTypes: string[];
+    configParams: { name: string; type: string }[];
+    publicClient: any
+  }): Promise<IFullAssistantConfig> {
+    
 
-  // const UPURD = await UPContract.getData(
-  //   // ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegate
-  //   "0x0cfc51aec37c55a4d0b1a65c6255c4bf2fbdf6277f3cc0730c45b828b6db8b47"
-  // );
+  // Build the keys for each supported transaction type.
+    const assistantTypesConfigKeys = supportedTransactionTypes.map(id =>
+        generateMappingKey("UAPTypeConfig", id)
+    );
 
-  // console.log('UPURD', UPURD)
-
-  // const signer = await client.getSigner();
-  const upProvider = createClientUPProvider();
-
-  const browserProvider = new ethers.BrowserProvider(
-    upProvider as unknown as Eip1193Provider
-  );
-
-  // console.log('signer', signer)
-  const upContract = ERC725__factory.connect(
-    '0x291adFfb41456d589137eA2A009A6D797DB97468',
-    browserProvider
-  ); // todo it is not the up address it is the page address
-
-  // Assistant's config key
-  const assistantConfigKey = generateMappingKey(
-    'UAPExecutiveConfig',
-    assistantAddress
-  );
-  const params = [assistantConfigKey];
-  const configData = await upContract.getDataBatch(params);
-  console.log('Result:', configData); // Show the keys you pass
-
-  // The first N items in configData will be for type configurations
-  const typeConfigValues = configData.slice(
-    0,
-    supportedTransactionTypes.length
-  );
-  // The last item is the assistant’s own configuration
-  const assistantConfigValue = configData[supportedTransactionTypes.length];
-
-  const abiCoder = new AbiCoder();
-  const previouslySelectedTypes: string[] = [];
-  const previouslySavedTypeConfigAddresses: Record<string, string[]> = {};
-
-  // Decode each transaction type’s addresses
-  typeConfigValues.forEach((encodedValue, index) => {
-    const typeId = supportedTransactionTypes[index];
-    if (!encodedValue || encodedValue === '0x') {
-      previouslySavedTypeConfigAddresses[typeId] = [];
-      return;
-    }
-    const storedAssistantAddresses = customDecodeAddresses(encodedValue);
-    previouslySavedTypeConfigAddresses[typeId] = storedAssistantAddresses;
-
-    // If the assistant is in that array, mark this type as selected
-    if (
-      storedAssistantAddresses
-        .map(addr => addr.toLowerCase())
-        .includes(assistantAddress.toLowerCase())
-    ) {
-      previouslySelectedTypes.push(typeId);
-    }
-  });
-
-  // Determine if the assistant is subscribed to at least one type
-  const isUPSubscribedToAssistant = previouslySelectedTypes.length > 0;
-
-  // Decode the assistant’s own config for the custom fields
-  let fetchedFieldValues: Record<string, string> | undefined = undefined;
-  if (assistantConfigValue !== '0x') {
-    fetchedFieldValues = {};
-    const types = configParams.map(param => param.type);
-    const decoded = abiCoder.decode(types, assistantConfigValue);
-    configParams.forEach((param, index) => {
-      fetchedFieldValues![param.name] = decoded[index].toString();
+    // Assistant's config key
+    const assistantConfigKey = generateMappingKey("UAPExecutiveConfig", assistantAddress);
+    const params = [...assistantTypesConfigKeys, assistantConfigKey];
+    // Fetch raw data directly from the contract
+    const configData = await publicClient.readContract({
+        address: upAddress,
+        abi: ERC725Y_ABI,
+        functionName: "getDataBatch",
+        args: [params],
     });
-  }
-
-  return {
-    typeConfigAddresses: previouslySavedTypeConfigAddresses,
-    selectedConfigTypes: previouslySelectedTypes,
-    isUPSubscribedToAssistant,
-    fieldValues: fetchedFieldValues,
+    const typeConfigValues = configData.slice(0, supportedTransactionTypes.length);
+    const assistantConfigValue = configData[supportedTransactionTypes.length];
+  
+    const abiCoder = new AbiCoder();
+    const previouslySelectedTypes: string[] = [];
+    const previouslySavedTypeConfigAddresses: Record<string, string[]> = {};
+  
+    typeConfigValues.forEach((encodedValue, index) => {
+      const typeId = supportedTransactionTypes[index];
+      if (!encodedValue || encodedValue === "0x") {
+        previouslySavedTypeConfigAddresses[typeId] = [];
+        return;
+      }
+      const storedAssistantAddresses = customDecodeAddresses(encodedValue);
+      previouslySavedTypeConfigAddresses[typeId] = storedAssistantAddresses;
+  
+      if (storedAssistantAddresses.map(addr => addr.toLowerCase()).includes(assistantAddress.toLowerCase())) {
+        previouslySelectedTypes.push(typeId);
+      }
+    });
+  
+    const isUPSubscribedToAssistant = previouslySelectedTypes.length > 0;
+    let fetchedFieldValues: Record<string, string> | undefined = undefined;
+  
+    if (assistantConfigValue !== "0x") {
+      fetchedFieldValues = {};
+      const types = configParams.map(param => param.type);
+      const decoded = abiCoder.decode(types, assistantConfigValue);
+      configParams.forEach((param, index) => {
+        fetchedFieldValues![param.name] = decoded[index].toString();
+      });
+    }
+  
+    return {
+      typeConfigAddresses: previouslySavedTypeConfigAddresses,
+      selectedConfigTypes: previouslySelectedTypes,
+      isUPSubscribedToAssistant,
+      fieldValues: fetchedFieldValues,
+    };
   };
-};
