@@ -27,10 +27,11 @@ const RPC_ENDPOINT_MAINNET = 'https://rpc.mainnet.lukso.network';
 
 interface LuksoProfileProps {
   address: string;
+  percentageTipped: string;
 }
 
-export function LuksoProfile({ address }: LuksoProfileProps) {
-  const { setIsSearching, chainId } = useUpProvider();
+export function LuksoProfile({ address, percentageTipped }: LuksoProfileProps) {
+  const { chainId } = useUpProvider();
   const [profileData, setProfileData] = useState<{
     imgUrl: string;
     fullName: string;
@@ -124,7 +125,7 @@ export function LuksoProfile({ address }: LuksoProfileProps) {
           }}
         >
           {' '}
-          Continuously Tipping 1%
+          Continuously Tipping {percentageTipped}%
         </div>
       </div>
     </lukso-card>

@@ -37,6 +37,8 @@ function MainContent() {
   const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] =
     useState(false);
   const [shouldDisplaySettings, setShouldDisplaySettings] = useState(false);
+  const [percentageTipped, setPercentageTipped] = useState('');
+  const [destinationAddress, setDestinationAddress] = useState('');
 
   useEffect(() => {
     // Load web component here if needed
@@ -62,8 +64,16 @@ function MainContent() {
           configParams,
           publicClient,
         });
-        setIsUPSubscribedToAssistant(true);
-        console.log('finish usereffects');
+        setIsUPSubscribedToAssistant(
+          assistantResponse.isUPSubscribedToAssistant
+        );
+        if (
+          assistantResponse.isUPSubscribedToAssistant &&
+          assistantResponse.fieldValues
+        ) {
+          setPercentageTipped(Number(assistantResponse.fieldValues.tipAmount));
+          setDestinationAddress(assistantResponse.fieldValues.tipAddress);
+        }
       } catch (err) {
         console.error('Failed to load existing config:', err);
       } finally {
@@ -88,7 +98,13 @@ function MainContent() {
   }
 
   if (shouldDisplaySettings) {
-    return <Settings onBack={() => setShouldDisplaySettings(false)} />;
+    return (
+      <Settings
+        loadedDestinationAddress={destinationAddress}
+        loadedPercentageTipped={percentageTipped}
+        onBack={() => setShouldDisplaySettings(false)}
+      />
+    );
   }
 
   return (
@@ -121,7 +137,10 @@ function MainContent() {
           Tip Assistant
         </div>
 
-        <LuksoProfile address={'0x291adFfb41456d589137eA2A009A6D797DB97468'} />
+        <LuksoProfile
+          address={destinationAddress}
+          percentageTipped={percentageTipped}
+        />
 
         <button
           style={{

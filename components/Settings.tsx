@@ -1,9 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-function Settings({ onBack }: { onBack: () => void }) {
-  const [destinationAddress, setDestinationAddress] = useState('');
-  const [tipPercentage, setTipPercentage] = useState('');
+function Settings({
+  loadedDestinationAddress = '',
+  loadedPercentageTipped = '',
+  onBack,
+}: {
+  onBack: () => void;
+  loadedDestinationAddress?: string; // Allow optional props
+  loadedPercentageTipped?: string;
+}) {
+  const [destinationAddress, setDestinationAddress] = useState(
+    loadedDestinationAddress || ''
+  );
+  const [tipPercentage, setTipPercentage] = useState(
+    loadedPercentageTipped || ''
+  );
   const [errorMessage, setErrorMessage] = useState('');
+
+  useEffect(() => {
+    setDestinationAddress(loadedDestinationAddress || '');
+    setTipPercentage(loadedPercentageTipped || '');
+    debugger;
+  }, [loadedDestinationAddress, loadedPercentageTipped]);
 
   const validateTipPercentage = (value: string) => {
     const number = parseInt(value, 10);
