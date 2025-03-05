@@ -71,7 +71,7 @@ function MainContent() {
           assistantResponse.isUPSubscribedToAssistant &&
           assistantResponse.fieldValues
         ) {
-          setPercentageTipped(Number(assistantResponse.fieldValues.tipAmount));
+          setPercentageTipped(assistantResponse.fieldValues.tipAmount);
           setDestinationAddress(assistantResponse.fieldValues.tipAddress);
         }
       } catch (err) {
