@@ -309,9 +309,9 @@ function MainContent() {
             fontWeight: 'bold',
             cursor: 'pointer',
           }}
-      >
-       Settings
-      </button>
+        >
+          Settings
+        </button>
         <PoweredByBanner />
       </div>
     </>
