@@ -22,23 +22,23 @@ function Settings({ onBack }: { onBack: () => void }) {
   };
 
   return (
-    <div style={{margin: '0 30px'}}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: 'PT Mono',
-            fontWeight: 'bold',
-          }}
-        >
-          Tip Assistant
-        </div>      
-      <label >Destination Address</label>
+    <div style={{ margin: '0 30px' }}>
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          fontFamily: 'PT Mono',
+          fontWeight: 'bold',
+        }}
+      >
+        Tip Assistant
+      </div>
+      <label>Destination Address</label>
       <input
         type="text"
         value={destinationAddress}
-        onChange={(e) => setDestinationAddress(e.target.value)}
+        onChange={e => setDestinationAddress(e.target.value)}
         placeholder="Enter destination address"
         style={{ width: '100%', padding: '5px', marginBottom: '10px' }}
       />
@@ -47,11 +47,11 @@ function Settings({ onBack }: { onBack: () => void }) {
       <input
         type="text"
         value={tipPercentage}
-        onChange={(e) => setTipPercentage(e.target.value)}
+        onChange={e => setTipPercentage(e.target.value)}
         placeholder="e.g. 10"
         style={{ width: '100%', padding: '5px', marginBottom: '5px' }}
       />
-      
+
       {errorMessage && (
         <p style={{ color: 'red', fontSize: '12px' }}>{errorMessage}</p>
       )}

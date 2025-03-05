@@ -265,7 +265,6 @@ function MainContent() {
 
   if (shouldDisplaySettings) {
     return <Settings onBack={() => setShouldDisplaySettings(false)} />;
-
   }
 
   return (
