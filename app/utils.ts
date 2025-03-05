@@ -50,82 +50,90 @@ interface IFullAssistantConfig {
 }
 
 const ERC725Y_ABI = [
-    {
-      type: "function",
-      name: "getDataBatch",
-      stateMutability: "view",
-      inputs: [{ type: "bytes32[]" }],
-      outputs: [{ type: "bytes[]" }],
-    },
-  ];
+  {
+    type: 'function',
+    name: 'getDataBatch',
+    stateMutability: 'view',
+    inputs: [{ type: 'bytes32[]' }],
+    outputs: [{ type: 'bytes[]' }],
+  },
+];
 
 export const fetchAssistantConfig = async function ({
-    upAddress,
-    assistantAddress,
-    supportedTransactionTypes,
-    configParams,
-    publicClient,
-  }: {
-    upAddress: string;
-    assistantAddress: string;
-    supportedTransactionTypes: string[];
-    configParams: { name: string; type: string }[];
-    publicClient: any
-  }): Promise<IFullAssistantConfig> {
-    
-
+  upAddress,
+  assistantAddress,
+  supportedTransactionTypes,
+  configParams,
+  publicClient,
+}: {
+  upAddress: string;
+  assistantAddress: string;
+  supportedTransactionTypes: string[];
+  configParams: { name: string; type: string }[];
+  publicClient: any;
+}): Promise<IFullAssistantConfig> {
   // Build the keys for each supported transaction type.
-    const assistantTypesConfigKeys = supportedTransactionTypes.map(id =>
-        generateMappingKey("UAPTypeConfig", id)
-    );
+  const assistantTypesConfigKeys = supportedTransactionTypes.map(id =>
+    generateMappingKey('UAPTypeConfig', id)
+  );
 
-    // Assistant's config key
-    const assistantConfigKey = generateMappingKey("UAPExecutiveConfig", assistantAddress);
-    const params = [...assistantTypesConfigKeys, assistantConfigKey];
-    // Fetch raw data directly from the contract
-    const configData = await publicClient.readContract({
-        address: upAddress,
-        abi: ERC725Y_ABI,
-        functionName: "getDataBatch",
-        args: [params],
-    });
-    const typeConfigValues = configData.slice(0, supportedTransactionTypes.length);
-    const assistantConfigValue = configData[supportedTransactionTypes.length];
-  
-    const abiCoder = new AbiCoder();
-    const previouslySelectedTypes: string[] = [];
-    const previouslySavedTypeConfigAddresses: Record<string, string[]> = {};
-  
-    typeConfigValues.forEach((encodedValue, index) => {
-      const typeId = supportedTransactionTypes[index];
-      if (!encodedValue || encodedValue === "0x") {
-        previouslySavedTypeConfigAddresses[typeId] = [];
-        return;
-      }
-      const storedAssistantAddresses = customDecodeAddresses(encodedValue);
-      previouslySavedTypeConfigAddresses[typeId] = storedAssistantAddresses;
-  
-      if (storedAssistantAddresses.map(addr => addr.toLowerCase()).includes(assistantAddress.toLowerCase())) {
-        previouslySelectedTypes.push(typeId);
-      }
-    });
-  
-    const isUPSubscribedToAssistant = previouslySelectedTypes.length > 0;
-    let fetchedFieldValues: Record<string, string> | undefined = undefined;
-  
-    if (assistantConfigValue !== "0x") {
-      fetchedFieldValues = {};
-      const types = configParams.map(param => param.type);
-      const decoded = abiCoder.decode(types, assistantConfigValue);
-      configParams.forEach((param, index) => {
-        fetchedFieldValues![param.name] = decoded[index].toString();
-      });
+  // Assistant's config key
+  const assistantConfigKey = generateMappingKey(
+    'UAPExecutiveConfig',
+    assistantAddress
+  );
+  const params = [...assistantTypesConfigKeys, assistantConfigKey];
+  // Fetch raw data directly from the contract
+  const configData = await publicClient.readContract({
+    address: upAddress,
+    abi: ERC725Y_ABI,
+    functionName: 'getDataBatch',
+    args: [params],
+  });
+  const typeConfigValues = configData.slice(
+    0,
+    supportedTransactionTypes.length
+  );
+  const assistantConfigValue = configData[supportedTransactionTypes.length];
+
+  const abiCoder = new AbiCoder();
+  const previouslySelectedTypes: string[] = [];
+  const previouslySavedTypeConfigAddresses: Record<string, string[]> = {};
+
+  typeConfigValues.forEach((encodedValue, index) => {
+    const typeId = supportedTransactionTypes[index];
+    if (!encodedValue || encodedValue === '0x') {
+      previouslySavedTypeConfigAddresses[typeId] = [];
+      return;
     }
-  
-    return {
-      typeConfigAddresses: previouslySavedTypeConfigAddresses,
-      selectedConfigTypes: previouslySelectedTypes,
-      isUPSubscribedToAssistant,
-      fieldValues: fetchedFieldValues,
-    };
+    const storedAssistantAddresses = customDecodeAddresses(encodedValue);
+    previouslySavedTypeConfigAddresses[typeId] = storedAssistantAddresses;
+
+    if (
+      storedAssistantAddresses
+        .map(addr => addr.toLowerCase())
+        .includes(assistantAddress.toLowerCase())
+    ) {
+      previouslySelectedTypes.push(typeId);
+    }
+  });
+
+  const isUPSubscribedToAssistant = previouslySelectedTypes.length > 0;
+  let fetchedFieldValues: Record<string, string> | undefined = undefined;
+
+  if (assistantConfigValue !== '0x') {
+    fetchedFieldValues = {};
+    const types = configParams.map(param => param.type);
+    const decoded = abiCoder.decode(types, assistantConfigValue);
+    configParams.forEach((param, index) => {
+      fetchedFieldValues![param.name] = decoded[index].toString();
+    });
+  }
+
+  return {
+    typeConfigAddresses: previouslySavedTypeConfigAddresses,
+    selectedConfigTypes: previouslySelectedTypes,
+    isUPSubscribedToAssistant,
+    fieldValues: fetchedFieldValues,
   };
+};
