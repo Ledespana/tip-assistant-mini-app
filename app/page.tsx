@@ -8,6 +8,7 @@ import { NoAssistant } from '@/components/NoAssistant';
 import PoweredByBanner from '@/components/PoweredBanner';
 import Settings from '@/components/Settings';
 import { TIP_ASSISTANT_CONFIG } from '@/config';
+import { LuksoProfile } from '@/components/LuksoProfile';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -122,9 +123,9 @@ function MainContent() {
         >
           Tip Assistant
         </div>
-        <TipProfile
-          destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'}
-        />
+
+              <LuksoProfile address={'0x291adFfb41456d589137eA2A009A6D797DB97468'} />
+
         <button
           style={{
             margin: '5px 0',

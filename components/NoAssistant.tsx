@@ -1,4 +1,4 @@
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
 
 //a) No assistant configure and visitor is not owner
@@ -9,18 +9,11 @@ export const NoAssistant = () => {
 
   useEffect(() => {
     if (!walletConnected) return;
-    async function compareAddresses() {
-      // Retrieve the string address from the signer
-      const signerAddress = await accounts[0].getAddress();
-      // Convert both addresses to lower case for comparison
-      if (signerAddress.toLowerCase() === contextAccounts[0].toLowerCase()) {
-        setDisplaySettings(true);
-      } else {
-        setDisplaySettings(false);
-      }
+    if (accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
+      setDisplaySettings(true);
+    } else {
+      setDisplaySettings(false);
     }
-
-    compareAddresses();
   }, [accounts, contextAccounts, walletConnected]);
   return (
     <div>
