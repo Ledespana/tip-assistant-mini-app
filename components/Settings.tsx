@@ -23,8 +23,17 @@ function Settings({ onBack }: { onBack: () => void }) {
 
   return (
     <div style={{margin: '0 30px'}}>
-      <h2 style={{ textAlign: 'center', fontFamily: 'PT Mono', fontWeight: 'bold'}}>Settings</h2>
-      
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'PT Mono',
+            fontWeight: 'bold',
+          }}
+        >
+          Tip Assistant
+        </div>      
       <label >Destination Address</label>
       <input
         type="text"
