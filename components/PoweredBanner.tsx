@@ -11,13 +11,13 @@ const PoweredByBanner = () => {
         target="_blank"
         rel="noopener noreferrer"
         style={{
-          margin: '10px',
+          margin: '5px',
           display: 'block',
-          backgroundColor: '#DB7C3D',
+          backgroundColor: '#f8fafb',
           fontSize: '12px',
-          width: '200px',
-          color: '#fff',
-          padding: '2px 5px',
+          width: '180px',
+          color: 'rgb(54 80 99 / 0.6)',
+          padding: '2px 2px',
           textAlign: 'center',
           borderRadius: '5px',
           textDecoration: 'none',

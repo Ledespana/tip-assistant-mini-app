@@ -285,6 +285,7 @@ function MainContent() {
             justifyContent: 'center',
             alignItems: 'center',
             fontFamily: 'PT Mono',
+            fontWeight: 'bold',
           }}
         >
           Tip Assistant
@@ -292,6 +293,25 @@ function MainContent() {
         <TipProfile
           destinationAddress={'0x291adFfb41456d589137eA2A009A6D797DB97468'}
         />
+        <button
+          style={{
+            margin: '5px 0',
+            display: 'block',
+            backgroundColor: '#DB7C3D',
+            fontSize: '12px',
+            width: '100%',
+            color: '#fff',
+            padding: '2px 5px',
+            textAlign: 'center',
+            borderRadius: '5px',
+            textDecoration: 'none',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+      >
+       Settings
+      </button>
         <PoweredByBanner />
       </div>
     </>
