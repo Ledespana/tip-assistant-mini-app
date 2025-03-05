@@ -1,17 +1,17 @@
 import { customEncodeAddresses, generateMappingKey } from '@/app/utils';
-import { UNIVERSAL_TIP_ASSISTANT_ADDRESS } from '@/config';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
 import { useEffect, useState } from 'react';
-import { encodeAbiParameters } from 'viem';
 
 function Settings({
+  onBack,
+  universalTipAssistant,
   loadedDestinationAddress = '',
   loadedPercentageTipped = '',
   loadedTypeConfigAddresses = [],
-  onBack,
 }: {
   onBack: () => void;
+  universalTipAssistant: string;
   loadedDestinationAddress?: string; // Allow optional props
   loadedPercentageTipped?: string;
   loadedTypeConfigAddresses?: string[];
@@ -61,12 +61,12 @@ function Settings({
           ...(updatedTypeConfigAddresses[typeId] || []),
         ];
         const currentAssistantIndex = currentTypeAddresses.findIndex(
-          a => a.toLowerCase() === UNIVERSAL_TIP_ASSISTANT_ADDRESS.toLowerCase()
+          a => a.toLowerCase() === universalTipAssistant.toLowerCase()
         );
         if (selectedConfigTypes.includes(typeId)) {
           // todo when configuring for first time
           if (currentAssistantIndex === -1) {
-            currentTypeAddresses.push(UNIVERSAL_TIP_ASSISTANT_ADDRESS);
+            currentTypeAddresses.push(universalTipAssistant);
           }
         } else {
           // todo, in theory not possible on Tip assistant V1
@@ -90,7 +90,7 @@ function Settings({
 
       const assistantConfigKey = generateMappingKey(
         'UAPExecutiveConfig',
-        UNIVERSAL_TIP_ASSISTANT_ADDRESS // todo handle mainnet/testnet
+        universalTipAssistant // todo handle mainnet/testnet
       );
       const types = ['address', 'uint256'];
       const values = [destinationAddress, tipPercentage];

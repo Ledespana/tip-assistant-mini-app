@@ -7,10 +7,7 @@ import { TipProfile } from '@/components/TipProfile';
 import { NoAssistant } from '@/components/NoAssistant';
 import PoweredByBanner from '@/components/PoweredBanner';
 import Settings from '@/components/Settings';
-import {
-  TIP_ASSISTANT_CONFIG,
-  UNIVERSAL_TIP_ASSISTANT_ADDRESS,
-} from '@/config';
+import { getAssistantAddress, TIP_ASSISTANT_CONFIG } from '@/config';
 import { LuksoProfile } from '@/components/LuksoProfile';
 import { fetchAssistantConfig } from './utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
@@ -31,8 +28,14 @@ if (typeof window !== 'undefined') {
  */
 function MainContent() {
   const [mounted, setMounted] = useState(false);
-  const { publicClient, client, accounts, contextAccounts, walletConnected } =
-    useUpProvider();
+  const {
+    publicClient,
+    client,
+    accounts,
+    contextAccounts,
+    walletConnected,
+    universalTipAssistant,
+  } = useUpProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] =
     useState(false);
@@ -60,7 +63,7 @@ function MainContent() {
 
         const assistantResponse = await fetchAssistantConfig({
           upAddress: contextAccounts[0],
-          assistantAddress: UNIVERSAL_TIP_ASSISTANT_ADDRESS,
+          assistantAddress: universalTipAssistant,
           supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
           configParams,
           publicClient,
@@ -74,7 +77,7 @@ function MainContent() {
         ) {
           setPercentageTipped(assistantResponse.fieldValues.tipAmount);
           setDestinationAddress(assistantResponse.fieldValues.tipAddress);
-          setTypeConfigAddresses(assistantResponse.typeConfigAddresses);
+          setTypeConfigAddresses(assistantResponse.typeConfigAddresses); // todo fix lint
         } else {
           setPercentageTipped('');
           setDestinationAddress('');
@@ -106,6 +109,7 @@ function MainContent() {
   if (shouldDisplaySettings) {
     return (
       <Settings
+        universalTipAssistant={universalTipAssistant}
         loadedDestinationAddress={destinationAddress}
         loadedPercentageTipped={percentageTipped}
         loadedTypeConfigAddresses={typeConfigAddresses}
