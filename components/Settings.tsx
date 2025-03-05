@@ -3,6 +3,7 @@ import { UNIVERSAL_TIP_ASSISTANT_ADDRESS } from '@/config';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
 import { useEffect, useState } from 'react';
+import { encodeAbiParameters } from 'viem';
 
 function Settings({
   loadedDestinationAddress = '',
@@ -43,9 +44,9 @@ function Settings({
 
     try {
       //   setIsProcessingTransaction(true);
-
+      // 1) Load existing config
       const updatedTypeConfigAddresses = { ...loadedTypeConfigAddresses };
-
+      const selectedConfigTypes = [LSP1_TYPE_IDS.LSP0ValueReceived];
       // 2) Figure out if the type needs to be added
       const dataKeys: string[] = [];
       const dataValues: string[] = [];
@@ -97,12 +98,77 @@ function Settings({
       dataKeys.push(assistantConfigKey);
       dataValues.push(assistantConfigValue);
 
-      const tx = await upContract.setDataBatch(dataKeys, dataValues);
-      await tx.wait();
+      //   const tx = await upContract.setDataBatch(dataKeys, dataValues);
+      //   await tx.wait();
     } catch (error) {
       console.error('Failed to save config:', error);
     }
   };
+
+  // const handleSave = async () => {
+  //     if (!validateTipPercentage(tipPercentage)) return;
+
+  //     try {
+  //       const updatedTypeConfigAddresses = { ...loadedTypeConfigAddresses };
+  //       const selectedConfigTypes = [LSP1_TYPE_IDS.LSP0ValueReceived];
+  //       const dataKeys: string[] = [];
+  //       const dataValues: string[] = [];
+
+  //       const assistantSupportedTransactionTypes = [LSP1_TYPE_IDS.LSP0ValueReceived];
+
+  //       assistantSupportedTransactionTypes.forEach(typeId => {
+  //         const currentTypeAddresses = [...(updatedTypeConfigAddresses[typeId] || [])];
+  //         const currentAssistantIndex = currentTypeAddresses.findIndex(
+  //           a => a.toLowerCase() === UNIVERSAL_TIP_ASSISTANT_ADDRESS.toLowerCase()
+  //         );
+
+  //         if (selectedConfigTypes.includes(typeId)) {
+  //           if (currentAssistantIndex === -1) {
+  //             currentTypeAddresses.push(UNIVERSAL_TIP_ASSISTANT_ADDRESS);
+  //           }
+  //         } else {
+  //           if (currentAssistantIndex !== -1) {
+  //             currentTypeAddresses.splice(currentAssistantIndex, 1);
+  //           }
+  //         }
+
+  //         updatedTypeConfigAddresses[typeId] = currentTypeAddresses;
+  //         const typeConfigKey = generateMappingKey("UAPTypeConfig", typeId);
+  //         dataKeys.push(typeConfigKey);
+  //         dataValues.push(currentTypeAddresses.length === 0 ? "0x" : customEncodeAddresses(currentTypeAddresses));
+  //       });
+
+  //       const assistantConfigKey = generateMappingKey("UAPExecutiveConfig", UNIVERSAL_TIP_ASSISTANT_ADDRESS);
+  //       const values = [destinationAddress, BigInt(tipPercentage)];
+
+  //       const assistantConfigValue = encodeAbiParameters(
+  //         [{ type: "address" }, { type: "uint256" }],
+  //         values
+  //       );
+
+  //       dataKeys.push(assistantConfigKey);
+  //       dataValues.push(assistantConfigValue);
+
+  //       const upContract = getContract({
+  //         address: upAddress,
+  //         abi: ERC725Y_ABI,
+  //         client: walletClient,
+  //       });
+
+  //       const txHash = await walletClient.writeContract({
+  //         address: upAddress,
+  //         abi: ERC725Y_ABI,
+  //         functionName: "setDataBatch",
+  //         args: [dataKeys, dataValues],
+  //         account: upAddress,
+  //       });
+
+  //       await publicClient.waitForTransactionReceipt({ hash: txHash });
+  //       console.log("Transaction successful:", txHash);
+  //     } catch (error) {
+  //       console.error("Failed to save config:", error);
+  //     }
+  //   };
 
   return (
     <div style={{ margin: '0 30px' }}>
