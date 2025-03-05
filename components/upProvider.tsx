@@ -1,19 +1,45 @@
+/**
+ * @component UpProvider
+ * @description Context provider that manages Universal Profile (UP) wallet connections and state
+ * for LUKSO blockchain interactions on Grid. It handles wallet connection status, account management, and chain
+ * information while providing real-time updates through event listeners.
+ *
+ * @provides {UpProviderContext} Context containing:
+ * - provider: UP-specific wallet provider instance
+ * - client: Viem wallet client for blockchain interactions
+ * - chainId: Current blockchain network ID
+ * - accounts: Array of connected wallet addresses
+ * - contextAccounts: Array of Universal Profile accounts
+ * - walletConnected: Boolean indicating active wallet connection
+ * - selectedAddress: Currently selected address for transactions
+ * - isSearching: Loading state indicator
+ */
 'use client';
 
-import { createClientUPProvider } from '@lukso/up-provider';
-import { BrowserProvider } from 'ethers';
-import React, {
+import { createClientUPProvider, UPClientProvider } from '@lukso/up-provider';
+import {
+  createPublicClient,
+  createWalletClient,
+  custom,
+  http,
+  PublicClient,
+  WalletClient,
+  Chain,
+} from 'viem';
+import { lukso, luksoTestnet } from 'viem/chains';
+import {
   createContext,
   useContext,
   useEffect,
   useState,
-  useRef,
   ReactNode,
 } from 'react';
 
 interface UpProviderContext {
-  provider: any;
-  client: BrowserProvider | null;
+  provider: UPClientProvider | null;
+  client: WalletClient | null;
+  publicClient: PublicClient;
+  chain: Chain;
   chainId: number;
   accounts: Array<`0x${string}`>;
   contextAccounts: Array<`0x${string}`>;
@@ -25,6 +51,9 @@ interface UpProviderContext {
 }
 
 const UpContext = createContext<UpProviderContext | undefined>(undefined);
+
+const provider =
+  typeof window !== 'undefined' ? createClientUPProvider() : null;
 
 export function useUpProvider() {
   const context = useContext(UpContext);
@@ -38,10 +67,6 @@ interface UpProviderProps {
   children: ReactNode;
 }
 
-// Create the UP Provider once, if in the browser
-const upProvider =
-  typeof window !== 'undefined' ? createClientUPProvider() : null;
-
 export function UpProvider({ children }: UpProviderProps) {
   const [chainId, setChainId] = useState<number>(0);
   const [accounts, setAccounts] = useState<Array<`0x${string}`>>([]);
@@ -53,89 +78,87 @@ export function UpProvider({ children }: UpProviderProps) {
     null
   );
   const [isSearching, setIsSearching] = useState(false);
+  const [client, setClient] = useState<WalletClient | null>(null);
+  const chain = chainId === 42 ? lukso : luksoTestnet;
+  const publicClient = createPublicClient({
+    chain: chain,
+    transport: http(),
+  });
 
-  // Create the Ethers client once from the UP provider (if present)
-  const [client, setClient] = useState<BrowserProvider | null>(null);
-
-  // Only do this once on mount (or if `upProvider` changes)
   useEffect(() => {
-    if (!upProvider) return;
-    setClient(new BrowserProvider(upProvider));
-  }, [upProvider]);
+    if (provider && chainId) {
+      const newClient = createWalletClient({
+        chain: chain,
+        transport: custom(provider),
+      });
+      setClient(newClient);
+    }
+  }, [provider, chainId]);
 
-  // This effect runs once the Ethers client is set
   useEffect(() => {
-    if (!client || !upProvider) return;
-
     let mounted = true;
 
     async function init() {
       try {
-        // Get the current network chainId using ethers
-        const network = await client.getNetwork();
-        if (mounted) {
-          setChainId(network.chainId);
-        }
+        if (!client || !provider) return;
 
-        // Get the list of accounts using ethers
-        const _accounts = await client.listAccounts();
-        if (mounted) {
-          setAccounts(_accounts as Array<`0x${string}`>);
-        }
+        const _chainId = (await client.getChainId()) as number;
+        if (!mounted) return;
+        setChainId(_chainId);
 
-        // Use the contextAccounts from the UP provider directly
-        const _contextAccounts = upProvider.contextAccounts || [];
-        if (mounted) {
-          setContextAccounts(_contextAccounts);
-          setWalletConnected(
-            _accounts.length > 0 && _contextAccounts.length > 0
-          );
-        }
+        const _accounts = (await client.getAddresses()) as Array<`0x${string}`>;
+        if (!mounted) return;
+        setAccounts(_accounts);
+
+        const _contextAccounts = provider.contextAccounts;
+        if (!mounted) return;
+        setContextAccounts(_contextAccounts);
+        setWalletConnected(_accounts.length > 0 && _contextAccounts.length > 0);
       } catch (error) {
-        console.error('Init error:', error);
+        console.error(error);
       }
     }
 
     init();
 
-    // Listen to changes from the UP provider
-    const handleAccountsChanged = (_accounts: Array<`0x${string}`>) => {
-      setAccounts(_accounts);
-      setWalletConnected(_accounts.length > 0 && contextAccounts.length > 0);
-    };
+    if (provider) {
+      const accountsChanged = (_accounts: Array<`0x${string}`>) => {
+        setAccounts(_accounts);
+        setWalletConnected(_accounts.length > 0 && contextAccounts.length > 0);
+      };
 
-    const handleContextAccountsChanged = (
-      _contextAccounts: Array<`0x${string}`>
-    ) => {
-      setContextAccounts(_contextAccounts);
-      setWalletConnected(accounts.length > 0 && _contextAccounts.length > 0);
-    };
+      const contextAccountsChanged = (_accounts: Array<`0x${string}`>) => {
+        setContextAccounts(_accounts);
+        setWalletConnected(accounts.length > 0 && _accounts.length > 0);
+      };
 
-    const handleChainChanged = (_chainId: number) => {
-      // Only update if it actually changes
-      setChainId(prev => (prev !== _chainId ? _chainId : prev));
-    };
+      const chainChanged = (_chainId: number) => {
+        setChainId(_chainId);
+      };
 
-    upProvider.on('accountsChanged', handleAccountsChanged);
-    upProvider.on('chainChanged', handleChainChanged);
-    upProvider.on('contextAccountsChanged', handleContextAccountsChanged);
+      provider.on('accountsChanged', accountsChanged);
+      provider.on('chainChanged', chainChanged);
+      provider.on('contextAccountsChanged', contextAccountsChanged);
 
-    return () => {
-      mounted = false;
-      upProvider.removeListener('accountsChanged', handleAccountsChanged);
-      upProvider.removeListener('chainChanged', handleChainChanged);
-      upProvider.removeListener(
-        'contextAccountsChanged',
-        handleContextAccountsChanged
-      );
-    };
-  }, [client, upProvider, contextAccounts.length, accounts.length]);
+      return () => {
+        mounted = false;
+        provider.removeListener('accountsChanged', accountsChanged);
+        provider.removeListener(
+          'contextAccountsChanged',
+          contextAccountsChanged
+        );
+        provider.removeListener('chainChanged', chainChanged);
+      };
+    }
+  }, [client, accounts.length, contextAccounts.length]);
 
   return (
     <UpContext.Provider
       value={{
-        provider: upProvider,
+        provider,
         client,
+        publicClient,
+        chain,
         chainId,
         accounts,
         contextAccounts,
