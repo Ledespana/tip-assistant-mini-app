@@ -203,6 +203,7 @@ function MainContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] =
     useState(false);
+  const [shouldDisplaySettings, setShouldDisplaySettings] = useState(false);
 
   useEffect(() => {
     // Load web component here if needed
@@ -261,6 +262,35 @@ function MainContent() {
     );
   }
 
+  if (shouldDisplaySettings) {
+    return (
+      <div>
+        <h1>Settings</h1>
+        <p>Configure your tip assistant settings here.</p>
+        <button
+          style={{
+            margin: '5px 0',
+            display: 'block',
+            backgroundColor: '#DB7C3D',
+            fontSize: '12px',
+            width: '100%',
+            color: '#fff',
+            padding: '2px 5px',
+            textAlign: 'center',
+            borderRadius: '5px',
+            textDecoration: 'none',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+          onClick={() => setShouldDisplaySettings(false)}
+        >
+          Back
+        </button>
+      </div>
+    );
+  }
+
   return (
     <>
       <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
@@ -309,6 +339,7 @@ function MainContent() {
             fontWeight: 'bold',
             cursor: 'pointer',
           }}
+          onClick={() => setShouldDisplaySettings(true)}
         >
           Settings
         </button>
