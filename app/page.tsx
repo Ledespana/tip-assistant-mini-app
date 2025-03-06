@@ -101,9 +101,33 @@ function MainContent() {
 
   if (!client || !walletConnected) {
     return (
-      <div>
-        <h1>Connect your wallet</h1>
-        <p>To start using the XXX, you need to connect your wallet.</p>
+      <div style={{ margin: '0 20px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'PT Mono',
+            fontWeight: 'bold',
+            color: '#243532',
+            marginBottom: '20px',
+          }}
+        >
+          Tip Assistant
+        </div>
+        <div
+          style={{
+            textAlign: 'center',
+            fontFamily: 'PT Mono',
+            color: 'rgb(122 157 184)',
+          }}
+        >
+          <p>
+            The Executive Assistant that automatically channels your receiving
+            LYX transaction to tip third party UP accounts.
+          </p>
+          <p>Connect your wallet to continue.</p>
+        </div>
       </div>
     );
   }
@@ -129,7 +153,7 @@ function MainContent() {
             alignItems: 'center',
             fontFamily: 'PT Mono',
             fontWeight: 'bold',
-            color: 'rgb(122 157 184)',
+            color: '#243532',
           }}
         >
           Tip Assistant
@@ -146,7 +170,7 @@ function MainContent() {
             alignItems: 'center',
             fontFamily: 'PT Mono',
             fontWeight: 'bold',
-            color: 'rgb(122 157 184)',
+            color: '#243532',
           }}
         >
           Tip Assistant

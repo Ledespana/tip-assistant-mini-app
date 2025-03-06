@@ -156,7 +156,7 @@ function Settings({
           alignItems: 'center',
           fontFamily: 'PT Mono',
           fontWeight: 'bold',
-          color: 'rgb(122 157 184)',
+          color: '#243532',
           marginBottom: '20px',
         }}
       >
