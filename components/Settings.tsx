@@ -27,8 +27,7 @@ function Settings({
   loadedPercentageTipped?: string;
   loadedTypeConfigAddresses?: string[];
 }) {
-  const { publicClient, client, accounts, contextAccounts, walletConnected } =
-    useUpProvider();
+  const { publicClient, client, contextAccounts } = useUpProvider();
   const [destinationAddress, setDestinationAddress] = useState(
     loadedDestinationAddress || ''
   );
@@ -147,7 +146,13 @@ function Settings({
       >
         Tip Assistant
       </div>
-      <label style={{ fontWeight: 'bold', color: 'rgb(122 157 184)' }}>
+      <label
+        style={{
+          fontWeight: 'bold',
+          color: 'rgb(122 157 184)',
+          fontFamily: 'PT Mono',
+        }}
+      >
         Destination Address
       </label>
       <input
@@ -160,10 +165,17 @@ function Settings({
           padding: '5px',
           marginBottom: '10px',
           opacity: '0.7',
+          fontFamily: 'PT Mono',
         }}
       />
 
-      <label style={{ fontWeight: 'bold', color: 'rgb(122 157 184)' }}>
+      <label
+        style={{
+          fontWeight: 'bold',
+          color: 'rgb(122 157 184)',
+          fontFamily: 'PT Mono',
+        }}
+      >
         Percentage of LYX to Tip
       </label>
       <input
@@ -176,6 +188,7 @@ function Settings({
           padding: '5px',
           marginBottom: '5px',
           opacity: '0.7',
+          fontFamily: 'PT Mono',
         }}
       />
 
