@@ -36,18 +36,18 @@ const PoweredByBanner = () => {
         <div
           style={{
             position: 'absolute',
-            top: '190px',
+            top: '80px',
             left: '50%',
             transform: 'translateX(-50%)',
-            backgroundColor: '#f8fafb',
-            color: 'rgb(122 157 184)',
+            backgroundColor: '#1b2832',
+            color: 'white',
             padding: '10px',
             borderRadius: '5px',
             boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
             zIndex: 100,
           }}
         >
-          Add this app to your Grid{'\n'}
+          Add this app to your Grid:{'\n'}
           https://tip-assistant-grid-app.netlify.app
         </div>
       )}

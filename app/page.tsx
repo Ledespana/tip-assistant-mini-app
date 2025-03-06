@@ -131,6 +131,7 @@ function MainContent() {
           </p>
           <p>Connect your wallet to continue.</p>
         </div>
+        <PoweredByBanner />
       </div>
     );
   }

@@ -112,7 +112,6 @@ export const fetchAssistantConfig = async function ({
   const previouslySavedTypeConfigAddresses: Record<string, string[]> = {};
 
   typeConfigValues.forEach((encodedValue: string, index: number) => {
-    
     const typeId = supportedTransactionTypes[index];
     if (!encodedValue || encodedValue === '0x') {
       previouslySavedTypeConfigAddresses[typeId] = [];
