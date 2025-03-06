@@ -2,6 +2,17 @@ import { customEncodeAddresses, generateMappingKey } from '@/app/utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
 import { useEffect, useState } from 'react';
+import { useUpProvider } from './upProvider';
+
+const ERC725Y_ABI = [
+  {
+    type: 'function',
+    name: 'setDataBatch',
+    stateMutability: 'nonpayable',
+    inputs: [{ type: 'bytes32[]' }, { type: 'bytes[]' }],
+    outputs: [],
+  },
+];
 
 function Settings({
   onBack,
@@ -16,6 +27,8 @@ function Settings({
   loadedPercentageTipped?: string;
   loadedTypeConfigAddresses?: string[];
 }) {
+  const { publicClient, client, accounts, contextAccounts, walletConnected } =
+    useUpProvider();
   const [destinationAddress, setDestinationAddress] = useState(
     loadedDestinationAddress || ''
   );
@@ -23,6 +36,8 @@ function Settings({
     loadedPercentageTipped || ''
   );
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     setDestinationAddress(loadedDestinationAddress || '');
@@ -41,6 +56,8 @@ function Settings({
 
   const handleSave = async () => {
     if (!validateTipPercentage(tipPercentage)) return;
+    setIsLoading(true);
+    setSuccessMessage('');
 
     try {
       //   setIsProcessingTransaction(true);
@@ -98,77 +115,22 @@ function Settings({
       dataKeys.push(assistantConfigKey);
       dataValues.push(assistantConfigValue);
 
-      //   const tx = await upContract.setDataBatch(dataKeys, dataValues);
-      //   await tx.wait();
+      const txHash = await client.writeContract({
+        address: contextAccounts[0],
+        abi: ERC725Y_ABI,
+        functionName: 'setDataBatch',
+        args: [dataKeys, dataValues],
+        account: contextAccounts[0],
+      });
+
+      await publicClient.waitForTransactionReceipt({ hash: txHash });
+      setSuccessMessage('Transaction successful!');
     } catch (error) {
       console.error('Failed to save config:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
-
-  // const handleSave = async () => {
-  //     if (!validateTipPercentage(tipPercentage)) return;
-
-  //     try {
-  //       const updatedTypeConfigAddresses = { ...loadedTypeConfigAddresses };
-  //       const selectedConfigTypes = [LSP1_TYPE_IDS.LSP0ValueReceived];
-  //       const dataKeys: string[] = [];
-  //       const dataValues: string[] = [];
-
-  //       const assistantSupportedTransactionTypes = [LSP1_TYPE_IDS.LSP0ValueReceived];
-
-  //       assistantSupportedTransactionTypes.forEach(typeId => {
-  //         const currentTypeAddresses = [...(updatedTypeConfigAddresses[typeId] || [])];
-  //         const currentAssistantIndex = currentTypeAddresses.findIndex(
-  //           a => a.toLowerCase() === UNIVERSAL_TIP_ASSISTANT_ADDRESS.toLowerCase()
-  //         );
-
-  //         if (selectedConfigTypes.includes(typeId)) {
-  //           if (currentAssistantIndex === -1) {
-  //             currentTypeAddresses.push(UNIVERSAL_TIP_ASSISTANT_ADDRESS);
-  //           }
-  //         } else {
-  //           if (currentAssistantIndex !== -1) {
-  //             currentTypeAddresses.splice(currentAssistantIndex, 1);
-  //           }
-  //         }
-
-  //         updatedTypeConfigAddresses[typeId] = currentTypeAddresses;
-  //         const typeConfigKey = generateMappingKey("UAPTypeConfig", typeId);
-  //         dataKeys.push(typeConfigKey);
-  //         dataValues.push(currentTypeAddresses.length === 0 ? "0x" : customEncodeAddresses(currentTypeAddresses));
-  //       });
-
-  //       const assistantConfigKey = generateMappingKey("UAPExecutiveConfig", UNIVERSAL_TIP_ASSISTANT_ADDRESS);
-  //       const values = [destinationAddress, BigInt(tipPercentage)];
-
-  //       const assistantConfigValue = encodeAbiParameters(
-  //         [{ type: "address" }, { type: "uint256" }],
-  //         values
-  //       );
-
-  //       dataKeys.push(assistantConfigKey);
-  //       dataValues.push(assistantConfigValue);
-
-  //       const upContract = getContract({
-  //         address: upAddress,
-  //         abi: ERC725Y_ABI,
-  //         client: walletClient,
-  //       });
-
-  //       const txHash = await walletClient.writeContract({
-  //         address: upAddress,
-  //         abi: ERC725Y_ABI,
-  //         functionName: "setDataBatch",
-  //         args: [dataKeys, dataValues],
-  //         account: upAddress,
-  //       });
-
-  //       await publicClient.waitForTransactionReceipt({ hash: txHash });
-  //       console.log("Transaction successful:", txHash);
-  //     } catch (error) {
-  //       console.error("Failed to save config:", error);
-  //     }
-  //   };
 
   return (
     <div style={{ margin: '0 30px' }}>
@@ -204,9 +166,18 @@ function Settings({
       {errorMessage && (
         <p style={{ color: 'red', fontSize: '12px' }}>{errorMessage}</p>
       )}
+      {successMessage && (
+        <p style={{ color: 'green', fontSize: '12px' }}>{successMessage}</p>
+      )}
+      {isLoading && (
+        <p style={{ color: 'blue', fontSize: '12px' }}>
+          Processing transaction...
+        </p>
+      )}
 
       <button
         onClick={handleSave}
+        disabled={isLoading}
         style={{
           margin: '5px 0',
           display: 'block',
@@ -225,7 +196,10 @@ function Settings({
       </button>
 
       <button
-        onClick={onBack}
+        onClick={() => {
+          onBack();
+        }}
+        disabled={isLoading}
         style={{
           margin: '5px 0',
           display: 'block',

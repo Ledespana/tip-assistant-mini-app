@@ -82,13 +82,12 @@ export function UpProvider({ children }: UpProviderProps) {
   );
   const [isSearching, setIsSearching] = useState(false);
   const [client, setClient] = useState<WalletClient | null>(null);
+  const [universalTipAssistant, setUniversalTipAssistant] = useState('');
   const chain = chainId === 42 ? lukso : luksoTestnet;
   const publicClient = createPublicClient({
     chain: chain,
     transport: http(),
   });
-
-  const universalTipAssistant = getAssistantAddress(chainId);
 
   useEffect(() => {
     if (provider && chainId) {
@@ -97,6 +96,9 @@ export function UpProvider({ children }: UpProviderProps) {
         transport: custom(provider),
       });
       setClient(newClient);
+    }
+    if (chainId) {
+      setUniversalTipAssistant(getAssistantAddress(chainId));
     }
   }, [provider, chainId]);
 
