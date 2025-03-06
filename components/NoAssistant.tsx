@@ -18,7 +18,7 @@ export const NoAssistant = () => {
   return (
     <div>
       <h1>Tip Assistant not installed</h1>
-      {displaySettings && <button>Install Tip Assistant</button>}
+      {/* {displaySettings && <button>Install Tip Assistant</button>} */}
     </div>
   );
 };

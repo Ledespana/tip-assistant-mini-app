@@ -1,8 +1,18 @@
 import { Info } from 'lucide-react';
 import { useState } from 'react';
+import { useUpProvider } from './upProvider';
 
 const PoweredByBanner = () => {
   const [showPopover, setShowPopover] = useState(false);
+  const { chainId } = useUpProvider();
+
+  const generateLink = () => {
+    if (chainId === 42) {
+      return 'https://upassistants.com';
+    } else {
+      return 'https://upassistants.com/lukso-testnet';
+    }
+  };
 
   return (
     <div
@@ -42,7 +52,7 @@ const PoweredByBanner = () => {
         </div>
       )}
       <a
-        href="https://upassistants.com"
+        href={generateLink()}
         target="_blank"
         rel="noopener noreferrer"
         style={{
