@@ -48,7 +48,7 @@ const PoweredByBanner = () => {
           }}
         >
           Add this app to your Grid{'\n'}
-          www...com
+          https://tip-assistant-grid-app.netlify.app
         </div>
       )}
       <a
