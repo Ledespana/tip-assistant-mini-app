@@ -42,7 +42,6 @@ function MainContent() {
   const [shouldDisplaySettings, setShouldDisplaySettings] = useState(false);
   const [percentageTipped, setPercentageTipped] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
-  const [typeConfigAddresses, setTypeConfigAddresses] = useState([]);
 
   useEffect(() => {
     // Load web component here if needed
@@ -75,11 +74,9 @@ function MainContent() {
       ) {
         setPercentageTipped(assistantResponse.fieldValues.tipAmount);
         setDestinationAddress(assistantResponse.fieldValues.tipAddress);
-        setTypeConfigAddresses(assistantResponse.typeConfigAddresses);
       } else {
         setPercentageTipped('');
         setDestinationAddress('');
-        setTypeConfigAddresses([]);
       }
     } catch (err) {
       console.error('Failed to load assistant config:', err);
@@ -117,7 +114,6 @@ function MainContent() {
         universalTipAssistant={universalTipAssistant}
         loadedDestinationAddress={destinationAddress}
         loadedPercentageTipped={percentageTipped}
-        loadedTypeConfigAddresses={typeConfigAddresses}
         onBack={backFromSettings}
       />
     );
@@ -161,26 +157,28 @@ function MainContent() {
           percentageTipped={percentageTipped}
         />
 
-        <button
-          style={{
-            margin: '5px 0',
-            display: 'block',
-            backgroundColor: '#DB7C3D',
-            fontSize: '12px',
-            width: '100%',
-            color: '#fff',
-            padding: '2px 5px',
-            textAlign: 'center',
-            borderRadius: '5px',
-            textDecoration: 'none',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-          }}
-          onClick={() => setShouldDisplaySettings(true)}
-        >
-          Settings
-        </button>
+        {contextAccounts[0].toLowerCase() === accounts[0].toLowerCase() && (
+          <button
+            style={{
+              margin: '5px 0',
+              display: 'block',
+              backgroundColor: '#DB7C3D',
+              fontSize: '12px',
+              width: '100%',
+              color: '#fff',
+              padding: '2px 5px',
+              textAlign: 'center',
+              borderRadius: '5px',
+              textDecoration: 'none',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+            onClick={() => setShouldDisplaySettings(true)}
+          >
+            Settings
+          </button>
+        )}
         <PoweredByBanner />
       </div>
     </>

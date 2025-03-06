@@ -1,8 +1,13 @@
-import { customEncodeAddresses, generateMappingKey } from '@/app/utils';
+import {
+  customEncodeAddresses,
+  fetchAssistantConfig,
+  generateMappingKey,
+} from '@/app/utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
 import { useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
+import { TIP_ASSISTANT_CONFIG } from '@/config';
 
 const ERC725Y_ABI = [
   {
@@ -19,15 +24,13 @@ function Settings({
   universalTipAssistant,
   loadedDestinationAddress = '',
   loadedPercentageTipped = '',
-  loadedTypeConfigAddresses = [],
 }: {
   onBack: () => void;
   universalTipAssistant: string;
   loadedDestinationAddress?: string; // Allow optional props
   loadedPercentageTipped?: string;
-  loadedTypeConfigAddresses?: string[];
 }) {
-  const { publicClient, client, contextAccounts } = useUpProvider();
+  const { publicClient, client, contextAccounts, chain } = useUpProvider();
   const [destinationAddress, setDestinationAddress] = useState(
     loadedDestinationAddress || ''
   );
@@ -54,14 +57,26 @@ function Settings({
   };
 
   const handleSave = async () => {
-    if (!validateTipPercentage(tipPercentage)) return;
+    if (!validateTipPercentage(tipPercentage) || !client) return;
     setIsLoading(true);
     setSuccessMessage('');
 
     try {
-      //   setIsProcessingTransaction(true);
       // 1) Load existing config
-      const updatedTypeConfigAddresses = { ...loadedTypeConfigAddresses };
+      const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
+        name,
+        type,
+      }));
+      const latestAssistantConfig = await fetchAssistantConfig({
+        upAddress: contextAccounts[0],
+        assistantAddress: universalTipAssistant,
+        supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+        configParams,
+        publicClient,
+      });
+      const updatedTypeConfigAddresses = {
+        ...latestAssistantConfig.typeConfigAddresses,
+      };
       const selectedConfigTypes = [LSP1_TYPE_IDS.LSP0ValueReceived];
       // 2) Figure out if the type needs to be added
       const dataKeys: string[] = [];
@@ -120,6 +135,7 @@ function Settings({
         functionName: 'setDataBatch',
         args: [dataKeys, dataValues],
         account: contextAccounts[0],
+        chain,
       });
 
       await publicClient.waitForTransactionReceipt({ hash: txHash });

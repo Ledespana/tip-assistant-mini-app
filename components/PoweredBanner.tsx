@@ -9,6 +9,7 @@ const PoweredByBanner = () => {
       style={{
         display: 'flex',
         justifyContent: 'flex-end',
+        marginTop: '10px',
       }}
     >
       <Info
