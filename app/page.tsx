@@ -3,11 +3,10 @@
 import { UpProvider } from '@/components/upProvider';
 import { useUpProvider } from '@/components/upProvider';
 import { useState, useEffect } from 'react';
-import { TipProfile } from '@/components/TipProfile';
 import { NoAssistant } from '@/components/NoAssistant';
 import PoweredByBanner from '@/components/PoweredBanner';
 import Settings from '@/components/Settings';
-import { getAssistantAddress, TIP_ASSISTANT_CONFIG } from '@/config';
+import { TIP_ASSISTANT_CONFIG } from '@/config';
 import { LuksoProfile } from '@/components/LuksoProfile';
 import { fetchAssistantConfig } from './utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
@@ -97,6 +96,10 @@ function MainContent() {
 
   if (!mounted) {
     return null; // or a loading placeholder
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
   }
 
   if (!client || !walletConnected) {

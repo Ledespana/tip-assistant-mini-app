@@ -43,7 +43,7 @@ export function customDecodeAddresses(encoded: string): string[] {
   const numAddresses = parseInt(numAddressesHex, 16);
 
   // Extract each 20-byte address
-  let addresses: string[] = [];
+  const addresses: string[] = [];
   for (let i = 0; i < numAddresses; i++) {
     const startIdx = 4 + i * 40; // 4 hex chars for length, then 40 hex chars per address (20 bytes)
     const addressHex = `0x${data.substring(startIdx, startIdx + 40)}`;

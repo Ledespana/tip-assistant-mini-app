@@ -34,7 +34,6 @@ import {
   useState,
   ReactNode,
 } from 'react';
-import { get } from 'http';
 import { getAssistantAddress } from '@/config';
 
 interface UpProviderContext {
