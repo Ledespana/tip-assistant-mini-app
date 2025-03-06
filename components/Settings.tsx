@@ -141,26 +141,42 @@ function Settings({
           alignItems: 'center',
           fontFamily: 'PT Mono',
           fontWeight: 'bold',
+          color: 'rgb(122 157 184)',
+          marginBottom: '20px',
         }}
       >
         Tip Assistant
       </div>
-      <label>Destination Address</label>
+      <label style={{ fontWeight: 'bold', color: 'rgb(122 157 184)' }}>
+        Destination Address
+      </label>
       <input
         type="text"
         value={destinationAddress}
         onChange={e => setDestinationAddress(e.target.value)}
         placeholder="Enter destination address"
-        style={{ width: '100%', padding: '5px', marginBottom: '10px' }}
+        style={{
+          width: '100%',
+          padding: '5px',
+          marginBottom: '10px',
+          opacity: '0.7',
+        }}
       />
 
-      <label>Percentage of LYX to Tip</label>
+      <label style={{ fontWeight: 'bold', color: 'rgb(122 157 184)' }}>
+        Percentage of LYX to Tip
+      </label>
       <input
         type="text"
         value={tipPercentage}
         onChange={e => setTipPercentage(e.target.value)}
         placeholder="e.g. 10"
-        style={{ width: '100%', padding: '5px', marginBottom: '5px' }}
+        style={{
+          width: '100%',
+          padding: '5px',
+          marginBottom: '5px',
+          opacity: '0.7',
+        }}
       />
 
       {errorMessage && (

@@ -132,6 +132,8 @@ function MainContent() {
             justifyContent: 'center',
             alignItems: 'center',
             fontFamily: 'PT Mono',
+            fontWeight: 'bold',
+            color: 'rgb(122 157 184)',
           }}
         >
           Tip Assistant
@@ -148,6 +150,7 @@ function MainContent() {
             alignItems: 'center',
             fontFamily: 'PT Mono',
             fontWeight: 'bold',
+            color: 'rgb(122 157 184)',
           }}
         >
           Tip Assistant
