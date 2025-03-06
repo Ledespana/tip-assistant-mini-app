@@ -15,14 +15,15 @@
     "@erc725/erc725.js": "^0.26.0",
     "@lukso/lsp-smart-contracts": "^0.15.0",
     "@lukso/up-provider": "0.3.1",
-    "ethers": "^6.13.5",
     "@lukso/web-components": "^1.104.0",
     "@radix-ui/react-slot": "^1.1.0",
     "class-variance-authority": "^0.7.1",
     "ethereum-blockies-base64": "^1.0.2",
+    "ethers": "^6.13.5",
     "graphql": "^16.10.0",
     "graphql-request": "^7.1.2",
     "localtunnel": "^2.0.2",
+    "lucide-react": "^0.477.0",
     "next": "15.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -38,11 +39,11 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.0",
     "postcss": "^8",
+    "prettier": "^3.1.0",
     "sass": "^1.83.1",
     "tailwindcss": "^3.4.1",
     "typechain": "^8.3.2",
-    "typescript": "^5",
-    "prettier": "^3.1.0"
+    "typescript": "^5"
   },
   "packageManager": "yarn@4.6.0"
 }

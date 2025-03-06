@@ -1,28 +1,23 @@
-export const UNIVERSAL_TIP_ASSISTANT_ADDRESS =
+export const MAINET_TIP_ASSISTANT_ADDRESS =
   '0x0c3dc7ea7521c79b99a667f2024d76714d33def2';
 
+export const TESNET_TIP_ASSISTANT_ADDRESS =
+  '0xf24c39a4d55994e70059443622fc166f05b5ff14';
+
+export const getAssistantAddress = (chainId: number): string => {
+  return chainId === 42
+    ? MAINET_TIP_ASSISTANT_ADDRESS
+    : TESNET_TIP_ASSISTANT_ADDRESS;
+};
+
 export const TIP_ASSISTANT_CONFIG = [
+  // todo needed?
   {
     name: 'tipAddress',
     type: 'address',
-    hidden: false,
-    description: 'The address you want to tip:',
-    placeholder: 'Enter destination address',
-    validationMessage: 'Tip address cannot be your own address',
-    validate: (value: any, upAddress: string) =>
-      value.toLowerCase() !== upAddress.toLowerCase(),
   },
   {
     name: 'tipAmount',
     type: 'uint256',
-    defaultValue: '2',
-    hidden: false,
-    description: 'Percentage of LYX to tip:',
-    placeholder: 'e.g 10',
-    validate: (value: any) => {
-      const number = parseInt(value);
-      return number > 0 && number <= 100 && value.indexOf('.') === -1;
-    },
-    validationMessage: 'Tip amount must be between 1 and 100 without decimals',
   },
 ];

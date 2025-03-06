@@ -34,6 +34,8 @@ import {
   useState,
   ReactNode,
 } from 'react';
+import { get } from 'http';
+import { getAssistantAddress } from '@/config';
 
 interface UpProviderContext {
   provider: UPClientProvider | null;
@@ -48,6 +50,7 @@ interface UpProviderContext {
   setSelectedAddress: (address: `0x${string}` | null) => void;
   isSearching: boolean;
   setIsSearching: (isSearching: boolean) => void;
+  universalTipAssistant: string;
 }
 
 const UpContext = createContext<UpProviderContext | undefined>(undefined);
@@ -79,6 +82,7 @@ export function UpProvider({ children }: UpProviderProps) {
   );
   const [isSearching, setIsSearching] = useState(false);
   const [client, setClient] = useState<WalletClient | null>(null);
+  const [universalTipAssistant, setUniversalTipAssistant] = useState('');
   const chain = chainId === 42 ? lukso : luksoTestnet;
   const publicClient = createPublicClient({
     chain: chain,
@@ -92,6 +96,9 @@ export function UpProvider({ children }: UpProviderProps) {
         transport: custom(provider),
       });
       setClient(newClient);
+    }
+    if (chainId) {
+      setUniversalTipAssistant(getAssistantAddress(chainId));
     }
   }, [provider, chainId]);
 
@@ -155,6 +162,7 @@ export function UpProvider({ children }: UpProviderProps) {
   return (
     <UpContext.Provider
       value={{
+        // todo refactor
         provider,
         client,
         publicClient,
@@ -167,6 +175,7 @@ export function UpProvider({ children }: UpProviderProps) {
         setSelectedAddress,
         isSearching,
         setIsSearching,
+        universalTipAssistant,
       }}
     >
       <div className="min-h-screen flex items-center justify-center">

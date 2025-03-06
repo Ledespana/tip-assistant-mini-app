@@ -1,7 +1,4 @@
-import { ERC725__factory } from '@/types';
-import { createClientUPProvider } from '@lukso/up-provider';
 import { AbiCoder } from 'ethers';
-import { BrowserProvider } from 'ethers';
 import { ethers } from 'ethers';
 
 export const TIP_ASSISTANT_CONFIG = [
@@ -21,6 +18,20 @@ export const generateMappingKey = (keyName: string, typeId: string): string => {
   const last20Bytes = typeId.slice(2, 42);
   return '0x' + first10Bytes + '0000' + last20Bytes;
 };
+
+export function customEncodeAddresses(addresses: string[]): string {
+  if (addresses.length > 65535) {
+    throw new Error('Number of addresses exceeds uint16 capacity.');
+  }
+
+  // Use ethers v6 `solidityPacked` to encode the length and addresses
+  const encoded = ethers.solidityPacked(
+    ['uint16', ...Array(addresses.length).fill('address')],
+    [addresses.length, ...addresses]
+  );
+
+  return encoded;
+}
 
 // Function to decode the encoded addresses
 export function customDecodeAddresses(encoded: string): string[] {
