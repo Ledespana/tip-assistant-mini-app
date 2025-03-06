@@ -51,47 +51,52 @@ function MainContent() {
     });
   }, []);
 
+  const fetchAndUpdateAssistantConfig = async () => {
+    try {
+      setIsLoading(true);
+      const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
+        name,
+        type,
+      }));
+
+      const assistantResponse = await fetchAssistantConfig({
+        upAddress: contextAccounts[0],
+        assistantAddress: universalTipAssistant,
+        supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+        configParams,
+        publicClient,
+      });
+
+      setIsUPSubscribedToAssistant(assistantResponse.isUPSubscribedToAssistant);
+
+      if (
+        assistantResponse.isUPSubscribedToAssistant &&
+        assistantResponse.fieldValues
+      ) {
+        setPercentageTipped(assistantResponse.fieldValues.tipAmount);
+        setDestinationAddress(assistantResponse.fieldValues.tipAddress);
+        setTypeConfigAddresses(assistantResponse.typeConfigAddresses);
+      } else {
+        setPercentageTipped('');
+        setDestinationAddress('');
+        setTypeConfigAddresses([]);
+      }
+    } catch (err) {
+      console.error('Failed to load assistant config:', err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!client || !walletConnected) return;
-    const loadExistingConfig = async () => {
-      try {
-        setIsLoading(true);
-        const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
-          name,
-          type,
-        }));
-
-        const assistantResponse = await fetchAssistantConfig({
-          upAddress: contextAccounts[0],
-          assistantAddress: universalTipAssistant,
-          supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
-          configParams,
-          publicClient,
-        });
-        setIsUPSubscribedToAssistant(
-          assistantResponse.isUPSubscribedToAssistant
-        );
-        if (
-          assistantResponse.isUPSubscribedToAssistant &&
-          assistantResponse.fieldValues
-        ) {
-          setPercentageTipped(assistantResponse.fieldValues.tipAmount);
-          setDestinationAddress(assistantResponse.fieldValues.tipAddress);
-          setTypeConfigAddresses(assistantResponse.typeConfigAddresses); // todo fix lint
-        } else {
-          setPercentageTipped('');
-          setDestinationAddress('');
-          setTypeConfigAddresses([]);
-        }
-      } catch (err) {
-        console.error('Failed to load existing config:', err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadExistingConfig();
+    fetchAndUpdateAssistantConfig();
   }, [accounts, publicClient, walletConnected]);
+
+  const backFromSettings = async () => {
+    await fetchAndUpdateAssistantConfig();
+    setShouldDisplaySettings(false);
+  };
 
   if (!mounted) {
     return null; // or a loading placeholder
@@ -113,7 +118,7 @@ function MainContent() {
         loadedDestinationAddress={destinationAddress}
         loadedPercentageTipped={percentageTipped}
         loadedTypeConfigAddresses={typeConfigAddresses}
-        onBack={() => setShouldDisplaySettings(false)}
+        onBack={backFromSettings}
       />
     );
   }
