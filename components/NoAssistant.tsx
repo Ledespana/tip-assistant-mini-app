@@ -3,6 +3,10 @@ import { useUpProvider } from './upProvider';
 
 //a) No assistant configure and visitor is not owner
 //b) No assistant configure and visitor is owner
+
+// on page load: 1) check if permissions are granted
+// 2) check if URD is installed
+// 3) check if assistant is installed
 export const NoAssistant = () => {
   const { accounts, contextAccounts, walletConnected } = useUpProvider();
   const [displaySettings, setDisplaySettings] = useState(false);
