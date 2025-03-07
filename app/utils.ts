@@ -7,7 +7,7 @@ import {
   SigningKey,
 } from 'ethers';
 import { ethers } from 'ethers';
-import { decodeAbiParameters, encodeAbiParameters } from 'viem';
+import { decodeAbiParameters, encodeAbiParameters, isAddress } from 'viem';
 import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json';
 import {
   createWalletClient,
@@ -15,6 +15,7 @@ import {
   getContract,
   waitForTransactionReceipt,
 } from 'viem';
+import { ERC725YDataKeys, LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 export const TIP_ASSISTANT_CONFIG = [
   {
@@ -82,6 +83,16 @@ const ERC725Y_ABI = [
     stateMutability: 'view',
     inputs: [{ type: 'bytes32[]' }],
     outputs: [{ type: 'bytes[]' }],
+  },
+  {
+    type: 'function',
+    name: 'setDataBatch',
+    stateMutability: 'nonpayable',
+    inputs: [
+      { name: 'keys', type: 'bytes32[]' },
+      { name: 'values', type: 'bytes[]' },
+    ],
+    outputs: [],
   },
 ];
 
@@ -164,6 +175,12 @@ export const fetchAssistantConfig = async function ({
   };
 };
 
+export const DEFAULT_UP_URD_PERMISSIONS = {
+  REENTRANCY: true,
+  SUPER_SETDATA: true,
+  SETDATA: true,
+};
+
 export const DEFAULT_UP_CONTROLLER_PERMISSIONS = {
   SUPER_SETDATA: true,
   SETDATA: true,
@@ -186,50 +203,6 @@ export const UAP_CONTROLLER_PERMISSIONS = {
   ADDUNIVERSALRECEIVERDELEGATE: true,
   CHANGEUNIVERSALRECEIVERDELEGATE: true,
 };
-
-/**
- * Function to update the permissions of the Browser Extension controller.
- */
-// export const updateBECPermissions = async (
-//     provider: BrowserProvider,
-//     account: string,
-//     mainUPController: string
-//   ) => {
-//     const signer = await provider.getSigner();
-//     // check if we need to update permissions
-//     // const missingPermissions = await doesControllerHaveMissingPermissions(
-//     //   mainUPController,
-//     //   account
-//     // );
-//     // if (!missingPermissions.length) {
-//     //   return;
-//     // }
-//     const UP = ERC725__factory.connect(account, provider);
-
-//     const erc725 = new ERC725(
-//       LSP6Schema as ERC725JSONSchema[],
-//       account,
-//       provider
-//     );
-
-//     const newPermissions = erc725.encodePermissions({
-//       ...DEFAULT_UP_CONTROLLER_PERMISSIONS,
-//       ...UAP_CONTROLLER_PERMISSIONS,
-//     });
-//     const permissionsData = erc725.encodeData([
-//       {
-//         keyName: 'AddressPermissions:Permissions:<address>',
-//         dynamicKeyParts: mainUPController,
-//         value: newPermissions,
-//       },
-//     ]);
-
-//     const setDataBatchTx = await UP.connect(signer).setDataBatch(
-//       permissionsData.keys,
-//       permissionsData.values
-//     );
-//     return await setDataBatchTx.wait();
-//   };
 
 export const updateBECPermissions = async (
   walletClient: any,
@@ -278,4 +251,154 @@ export const updateBECPermissions = async (
     console.error('Failed to update BEC permissions:', error);
     throw error;
   }
+};
+
+// export const subscribeToUapURD = async (
+//     provider: BrowserProvider,
+//     upAccount: string,
+//     uapURD: string
+//   ) => {
+//     const signer = await provider.getSigner();
+//     const URDdataKey = ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegate;
+//     const LSP7URDdataKey =
+//       ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegatePrefix +
+//       LSP1_TYPE_IDS.LSP7Tokens_RecipientNotification.slice(2, 42);
+//     const LSP8URDdataKey =
+//       ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegatePrefix +
+//       LSP1_TYPE_IDS.LSP8Tokens_RecipientNotification.slice(2, 42);
+
+//     const delegateKeys = [URDdataKey, LSP7URDdataKey, LSP8URDdataKey];
+//     const delegateValues = [uapURD, '0x', '0x'];
+
+//     const UP = ERC725__factory.connect(upAccount, provider);
+//     const upPermissions = new ERC725(
+//       LSP6Schema as ERC725JSONSchema[],
+//       upAccount,
+//       window.lukso
+//     );
+//     const checksumUapURD = getChecksumAddress(uapURD) as string;
+
+//     // Retrieve current controllers from the UP's permissions.
+//     const currentPermissionsData = await upPermissions.getData();
+//     const currentControllers = currentPermissionsData[0].value as string[];
+
+//     // Remove any existing instances of the UAP-URD to avoid duplicates.
+//     let updatedControllers = currentControllers.filter((controller: string) => {
+//       return getChecksumAddress(controller) !== checksumUapURD;
+//     });
+
+//     // Add the UAP-URD to the controllers.
+//     updatedControllers.push(checksumUapURD);
+
+//     // 4. Prepare permissions for the UAP-URD.
+//     const uapURDPermissions = upPermissions.encodePermissions({
+//       SUPER_CALL: true,
+//       SUPER_TRANSFERVALUE: true,
+//       ...DEFAULT_UP_URD_PERMISSIONS,
+//     });
+
+//     // Encode the new permissions and updated controllers data.
+//     const permissionsData = upPermissions.encodeData([
+//       {
+//         keyName: 'AddressPermissions:Permissions:<address>',
+//         dynamicKeyParts: checksumUapURD,
+//         value: uapURDPermissions,
+//       },
+//       {
+//         keyName: 'AddressPermissions[]',
+//         value: updatedControllers,
+//       },
+//     ]);
+
+//     // 5. Batch update all the data on the UP.
+//     const allKeys = [...delegateKeys, ...permissionsData.keys];
+//     const allValues = [...delegateValues, ...permissionsData.values];
+
+//     const tx = await UP.connect(signer).setDataBatch(allKeys, allValues);
+//     return tx.wait();
+//   };
+
+export const subscribeToUapURD = async (
+  walletClient: any, // Use Viem's WalletClient
+  upAccount: string,
+  uapURD: string
+) => {
+  console.log('Subscribing to UAP-URD...');
+
+  const URDdataKey = ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegate;
+  const LSP7URDdataKey =
+    ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegatePrefix +
+    LSP1_TYPE_IDS.LSP7Tokens_RecipientNotification.slice(2, 42);
+  const LSP8URDdataKey =
+    ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegatePrefix +
+    LSP1_TYPE_IDS.LSP8Tokens_RecipientNotification.slice(2, 42);
+
+  const delegateKeys = [URDdataKey, LSP7URDdataKey, LSP8URDdataKey];
+  const delegateValues = [uapURD, '0x', '0x'];
+
+  // Initialize ERC725 instance
+  const upPermissions = new ERC725(LSP6Schema as any, upAccount, walletClient);
+
+  const checksumUapURD = getChecksumAddress(uapURD) as string;
+
+  // Retrieve current controllers from the UP's permissions.
+  const currentPermissionsData = await upPermissions.getData();
+  const currentControllers = currentPermissionsData[0].value as string[];
+
+  // Remove any existing instances of the UAP-URD to avoid duplicates.
+  const updatedControllers = currentControllers.filter((controller: string) => {
+    return getChecksumAddress(controller) !== checksumUapURD;
+  });
+
+  // Add the UAP-URD to the controllers.
+  updatedControllers.push(checksumUapURD);
+
+  // 4. Prepare permissions for the UAP-URD.
+  const uapURDPermissions = upPermissions.encodePermissions({
+    SUPER_CALL: true,
+    SUPER_TRANSFERVALUE: true,
+    ...DEFAULT_UP_URD_PERMISSIONS,
+  });
+
+  // Encode the new permissions and updated controllers data.
+  const permissionsData = upPermissions.encodeData([
+    {
+      keyName: 'AddressPermissions:Permissions:<address>',
+      dynamicKeyParts: checksumUapURD,
+      value: uapURDPermissions,
+    },
+    {
+      keyName: 'AddressPermissions[]',
+      value: updatedControllers,
+    },
+  ]);
+
+  // 5. Batch update all the data on the UP.
+  const allKeys = [...delegateKeys, ...permissionsData.keys];
+  const allValues = [...delegateValues, ...permissionsData.values];
+
+  console.log('Writing contract data...');
+
+  const txHash = await walletClient.writeContract({
+    address: upAccount,
+    abi: ERC725Y_ABI,
+    functionName: 'setDataBatch',
+    args: [allKeys, allValues],
+    account: upAccount,
+  });
+
+  console.log('Transaction sent:', txHash);
+
+  return txHash;
+};
+
+export const getChecksumAddress = (address: string | null) => {
+  // Check if the address is valid
+  if (!address || !isAddress(address)) {
+    // Handle invalid address
+    return address;
+  }
+
+  // Convert to checksum address
+  return getAddress(address);
 };

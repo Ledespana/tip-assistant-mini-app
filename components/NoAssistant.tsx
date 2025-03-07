@@ -8,7 +8,8 @@ import {
   getContract,
 } from 'viem';
 import { verifyMessage } from 'ethers';
-import { updateBECPermissions } from '@/app/utils';
+import { subscribeToUapURD, updateBECPermissions } from '@/app/utils';
+import { getURDProtocolAddress } from '@/config';
 
 //a) No assistant configure and visitor is not owner
 //b) No assistant configure and visitor is owner
@@ -108,6 +109,22 @@ export const NoAssistant = () => {
     }
   };
 
+  const handleInstallUAP = async () => {
+    // setIsInstallingProtocol(true);
+    try {
+      const UAPProtocolAddress = getURDProtocolAddress(chainId);
+      await subscribeToUapURD(client, accounts[0], UAPProtocolAddress);
+      console.log('Subscribed to UAP Universal Receiver Delegate');
+    } catch (error: any) {
+      console.error(
+        'Error subscribing to UAP Universal Receiver Delegate',
+        error.message
+      );
+    } finally {
+      // setIsInstallingProtocol(false);
+    }
+  };
+
   return (
     <div>
       <h1>Tip Assistant not installed</h1>
@@ -154,6 +171,7 @@ export const NoAssistant = () => {
         )}
         {displaySettings && (
           <button
+            onClick={handleInstallUAP}
             style={{
               margin: '5px 0',
               display: 'block',

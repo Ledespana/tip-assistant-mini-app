@@ -10,6 +10,15 @@ export const getAssistantAddress = (chainId: number): string => {
     : TESNET_TIP_ASSISTANT_ADDRESS;
 };
 
+export const urdProtocolAddressMainnet =
+  '0xdbdf20705491e524ebd77957eed2c41ec9d7e5dc';
+export const urdProtocolAddressTestnet =
+  '0xcf44a050c9b1fc87141d77b646436443bdc05a2b';
+
+export const getURDProtocolAddress = (chainId: number): string => {
+  return chainId === 42 ? urdProtocolAddressMainnet : urdProtocolAddressTestnet;
+};
+
 export const TIP_ASSISTANT_CONFIG = [
   // todo needed?
   {
