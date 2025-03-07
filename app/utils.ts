@@ -1,5 +1,20 @@
-import { AbiCoder } from 'ethers';
+import ERC725, { ERC725JSONSchema } from '@erc725/erc725.js';
+import {
+  AbiCoder,
+  getAddress,
+  keccak256,
+  SignatureLike,
+  SigningKey,
+} from 'ethers';
 import { ethers } from 'ethers';
+import { decodeAbiParameters, encodeAbiParameters } from 'viem';
+import LSP6Schema from '@erc725/erc725.js/schemas/LSP6KeyManager.json';
+import {
+  createWalletClient,
+  http,
+  getContract,
+  waitForTransactionReceipt,
+} from 'viem';
 
 export const TIP_ASSISTANT_CONFIG = [
   {
@@ -147,4 +162,120 @@ export const fetchAssistantConfig = async function ({
     isUPSubscribedToAssistant,
     fieldValues: fetchedFieldValues,
   };
+};
+
+export const DEFAULT_UP_CONTROLLER_PERMISSIONS = {
+  SUPER_SETDATA: true,
+  SETDATA: true,
+  SIGN: true,
+  ENCRYPT: true,
+  DECRYPT: true,
+  SUPER_CALL: true,
+  CALL: true,
+  SUPER_STATICCALL: true,
+  STATICCALL: true,
+  SUPER_TRANSFERVALUE: true,
+  TRANSFERVALUE: true,
+  DEPLOY: true,
+  EXECUTE_RELAY_CALL: true,
+  EDITPERMISSIONS: true,
+  ADDCONTROLLER: true,
+};
+
+export const UAP_CONTROLLER_PERMISSIONS = {
+  ADDUNIVERSALRECEIVERDELEGATE: true,
+  CHANGEUNIVERSALRECEIVERDELEGATE: true,
+};
+
+/**
+ * Function to update the permissions of the Browser Extension controller.
+ */
+// export const updateBECPermissions = async (
+//     provider: BrowserProvider,
+//     account: string,
+//     mainUPController: string
+//   ) => {
+//     const signer = await provider.getSigner();
+//     // check if we need to update permissions
+//     // const missingPermissions = await doesControllerHaveMissingPermissions(
+//     //   mainUPController,
+//     //   account
+//     // );
+//     // if (!missingPermissions.length) {
+//     //   return;
+//     // }
+//     const UP = ERC725__factory.connect(account, provider);
+
+//     const erc725 = new ERC725(
+//       LSP6Schema as ERC725JSONSchema[],
+//       account,
+//       provider
+//     );
+
+//     const newPermissions = erc725.encodePermissions({
+//       ...DEFAULT_UP_CONTROLLER_PERMISSIONS,
+//       ...UAP_CONTROLLER_PERMISSIONS,
+//     });
+//     const permissionsData = erc725.encodeData([
+//       {
+//         keyName: 'AddressPermissions:Permissions:<address>',
+//         dynamicKeyParts: mainUPController,
+//         value: newPermissions,
+//       },
+//     ]);
+
+//     const setDataBatchTx = await UP.connect(signer).setDataBatch(
+//       permissionsData.keys,
+//       permissionsData.values
+//     );
+//     return await setDataBatchTx.wait();
+//   };
+
+export const updateBECPermissions = async (
+  walletClient: any,
+  publicClient: any,
+  account: string,
+  mainUPController: string,
+  ERC725Y_ABI: any
+) => {
+  try {
+    console.log('Updating BEC Permissions');
+
+    const erc725 = new ERC725(LSP6Schema as any, account, walletClient);
+
+    const newPermissions = erc725.encodePermissions({
+      ...DEFAULT_UP_CONTROLLER_PERMISSIONS,
+      ...UAP_CONTROLLER_PERMISSIONS,
+    });
+
+    const permissionsData = erc725.encodeData([
+      {
+        keyName: 'AddressPermissions:Permissions:<address>',
+        dynamicKeyParts: mainUPController,
+        value: newPermissions,
+      },
+    ]);
+
+    const txHash = await walletClient.writeContract({
+      address: account,
+      abi: ERC725Y_ABI,
+      functionName: 'setDataBatch',
+      args: [permissionsData.keys, permissionsData.values],
+      account,
+    });
+
+    console.log('Transaction sent:', txHash);
+    console.log('Waiting for transaction confirmation...');
+
+    // Use waitForTransactionReceipt to wait for confirmation
+    const receipt = await publicClient.waitForTransactionReceipt({
+      hash: txHash,
+    });
+
+    console.log('Transaction confirmed! Receipt:', receipt);
+    return receipt;
+  } catch (error: any) {
+    console.error('Failed to update BEC permissions:', error);
+    throw error;
+  }
 };

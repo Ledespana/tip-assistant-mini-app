@@ -1,5 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
+import { SiweMessage } from 'siwe';
+import {
+  createWalletClient,
+  http,
+  encodeAbiParameters,
+  getContract,
+} from 'viem';
+import { verifyMessage } from 'ethers';
+import { updateBECPermissions } from '@/app/utils';
 
 //a) No assistant configure and visitor is not owner
 //b) No assistant configure and visitor is owner
@@ -8,8 +17,20 @@ import { useUpProvider } from './upProvider';
 // 2) check if URD is installed
 // 3) enable buttons according to that
 export const NoAssistant = () => {
-  const { accounts, contextAccounts, walletConnected } = useUpProvider();
+  const {
+    accounts,
+    contextAccounts,
+    walletConnected,
+    chainId,
+    client,
+    publicClient,
+  } = useUpProvider();
   const [displaySettings, setDisplaySettings] = useState(false);
+  const [mainController, setMainController] = useState('');
+  const [arePermssionsSet, setArePermssionsSet] = useState(false);
+  const [isURDInstalled, setIsURDInstalled] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
 
   useEffect(() => {
     if (!walletConnected) return;
@@ -19,12 +40,81 @@ export const NoAssistant = () => {
       setDisplaySettings(false);
     }
   }, [accounts, contextAccounts, walletConnected]);
+
+  const sign = async (): Promise<boolean> => {
+    try {
+      if (!client) return false;
+      const siweMessage = new SiweMessage({
+        domain: window.location.host,
+        uri: window.location.origin,
+        address: [accounts[0]],
+        statement:
+          'Signing this message will enable the Universal Assistants Catalog to read your UP Browser Extension to manage Assistant configurations.',
+        version: '1',
+        chainId: chainId,
+        resources: [`${window.location.origin}/terms`],
+      }).prepareMessage();
+
+      const signature = await client.request({
+        method: 'personal_sign',
+        params: [siweMessage, accounts[0]],
+      });
+
+      const mainUPController = await verifyMessage(siweMessage, signature);
+      setMainController(mainUPController);
+      console.log('Verified UP Controller:', mainUPController);
+      return true;
+    } catch (error: any) {
+      console.error('ProfileProvider: Error', error);
+      throw error;
+    }
+  };
+
+  const ERC725Y_ABI = [
+    {
+      type: 'function',
+      name: 'setDataBatch',
+      stateMutability: 'nonpayable',
+      inputs: [{ type: 'bytes32[]' }, { type: 'bytes[]' }],
+      outputs: [],
+    },
+    {
+      type: 'function',
+      name: 'getData',
+      stateMutability: 'view',
+      inputs: [{ type: 'bytes32' }],
+      outputs: [{ type: 'bytes' }],
+    },
+  ];
+
+  const handleUpdateBECPermissions = async () => {
+    if (!mainController) return;
+
+    // setIsUpdatingPermissions(true);
+    try {
+      await updateBECPermissions(
+        client,
+        publicClient,
+        accounts[0],
+        mainController,
+        ERC725Y_ABI
+      );
+
+      // setHasExtensionPermissions(true);
+    } catch (error: any) {
+      console.log('Error updating permissions:', error);
+    } finally {
+      // setIsUpdatingPermissions(false);
+    }
+  };
+
   return (
     <div>
       <h1>Tip Assistant not installed</h1>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {displaySettings && (
           <button
+            onClick={sign}
             style={{
               margin: '5px 0',
               display: 'block',
@@ -39,7 +129,27 @@ export const NoAssistant = () => {
               cursor: 'pointer',
             }}
           >
-            1- Add Permissions
+            1- Sign
+          </button>
+        )}
+        {displaySettings && (
+          <button
+            onClick={handleUpdateBECPermissions}
+            style={{
+              margin: '5px 0',
+              display: 'block',
+              backgroundColor: '#DB7C3D',
+              fontSize: '12px',
+              width: '100%',
+              color: '#fff',
+              padding: '2px 5px',
+              textAlign: 'center',
+              borderRadius: '5px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            2- Add Permissions
           </button>
         )}
         {displaySettings && (
@@ -58,7 +168,7 @@ export const NoAssistant = () => {
               cursor: 'pointer',
             }}
           >
-            2- Install UAP Protocol
+            3- Install UAP Protocol
           </button>
         )}
         {displaySettings && (
@@ -77,7 +187,7 @@ export const NoAssistant = () => {
               cursor: 'pointer',
             }}
           >
-            3- Install Tip Assistant
+            4- Install Tip Assistant
           </button>
         )}
       </div>
