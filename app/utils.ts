@@ -16,6 +16,7 @@ import {
   waitForTransactionReceipt,
 } from 'viem';
 import { ERC725YDataKeys, LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import UniversalProfile from '@lukso/lsp-smart-contracts/artifacts/UniversalProfile.json';
 
 export const TIP_ASSISTANT_CONFIG = [
   {
@@ -401,4 +402,24 @@ export const getChecksumAddress = (address: string | null) => {
 
   // Convert to checksum address
   return getAddress(address);
+};
+
+export const isUAPInstalled = async (
+  publicClient: any,
+  upAddress: string,
+  expectedDelegate: string
+): Promise<boolean> => {
+  try {
+    const UPURD = await publicClient.readContract({
+      address: upAddress as `0x${string}`,
+      abi: UniversalProfile.abi,
+      functionName: 'getData',
+      args: [ERC725YDataKeys.LSP1.LSP1UniversalReceiverDelegate],
+    });
+
+    return UPURD?.toLowerCase() === expectedDelegate?.toLowerCase();
+  } catch (err) {
+    console.error('Error checking UAP installation:', err);
+    throw err;
+  }
 };

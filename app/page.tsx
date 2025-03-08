@@ -2,14 +2,14 @@
 
 import { UpProvider } from '@/components/upProvider';
 import { useUpProvider } from '@/components/upProvider';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { NoAssistant } from '@/components/NoAssistant';
 import PoweredByBanner from '@/components/PoweredBanner';
 import Settings from '@/components/Settings';
-import { TIP_ASSISTANT_CONFIG } from '@/config';
+import { getURDProtocolAddress, TIP_ASSISTANT_CONFIG } from '@/config';
 import { LuksoProfile } from '@/components/LuksoProfile';
-import { fetchAssistantConfig } from './utils';
-import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import { fetchAssistantConfig, isUAPInstalled } from './utils';
+import { ERC725YDataKeys, LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -34,10 +34,12 @@ function MainContent() {
     contextAccounts,
     walletConnected,
     universalTipAssistant,
+    chainId,
   } = useUpProvider();
   const [isLoading, setIsLoading] = useState(false);
   const [isUPSubscribedToAssistant, setIsUPSubscribedToAssistant] =
     useState(false);
+  const [isURDInstalled, setIsURDInstalled] = useState(false);
   const [shouldDisplaySettings, setShouldDisplaySettings] = useState(false);
   const [percentageTipped, setPercentageTipped] = useState('');
   const [destinationAddress, setDestinationAddress] = useState('');
@@ -48,6 +50,25 @@ function MainContent() {
       setMounted(true);
     });
   }, []);
+
+  const checkURDInstalled = useCallback(async () => {
+    if (!client || !walletConnected) return;
+
+    try {
+      const protocolAddress = getURDProtocolAddress(chainId);
+      const urdInstalled = await isUAPInstalled(
+        publicClient,
+        contextAccounts[0],
+        protocolAddress
+      );
+      debugger;
+
+      // setIsURDInstalled(urdInstalled);
+    } catch (error) {
+      console.error('Error checking assistant installation', error);
+      // setError("Failed to check assistant installation");
+    }
+  }, [client, walletConnected, contextAccounts, chainId]);
 
   const fetchAndUpdateAssistantConfig = async () => {
     try {
@@ -87,6 +108,7 @@ function MainContent() {
   useEffect(() => {
     if (!client || !walletConnected) return;
     fetchAndUpdateAssistantConfig();
+    checkURDInstalled();
   }, [accounts, publicClient, walletConnected]);
 
   const backFromSettings = async () => {

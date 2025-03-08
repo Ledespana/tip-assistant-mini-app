@@ -189,25 +189,6 @@ export const NoAssistant = () => {
             3- Install UAP Protocol
           </button>
         )}
-        {displaySettings && (
-          <button
-            style={{
-              margin: '5px 0',
-              display: 'block',
-              backgroundColor: '#DB7C3D',
-              fontSize: '12px',
-              width: '100%',
-              color: '#fff',
-              padding: '2px 5px',
-              textAlign: 'center',
-              borderRadius: '5px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-            }}
-          >
-            4- Install Tip Assistant
-          </button>
-        )}
       </div>
     </div>
   );
