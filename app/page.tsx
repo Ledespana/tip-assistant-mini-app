@@ -192,7 +192,6 @@ function MainContent() {
   //if Assistant is not configured, or URD is not configured and no wallet
   return (
     <>
-      return (
       <div
         style={{
           margin: '0 20px',
@@ -221,7 +220,6 @@ function MainContent() {
           <PoweredByBanner />
         </div>
       </div>
-      );
     </>
   );
 }

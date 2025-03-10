@@ -87,6 +87,7 @@ export const NoURD = ({ onInstall }: { onInstall: () => void }) => {
 
   const handleUpdateBECPermissions = async () => {
     if (!mainController) return;
+    if (accounts[0]?.toLowerCase() !== contextAccounts[0].toLowerCase()) return;
     setIsLoadingTransaction(true);
     try {
       await updateBECPermissions(
@@ -106,6 +107,7 @@ export const NoURD = ({ onInstall }: { onInstall: () => void }) => {
   };
 
   const handleInstallUAP = async () => {
+    if (accounts[0]?.toLowerCase() !== contextAccounts[0].toLowerCase()) return;
     setIsLoadingTransaction(true);
     try {
       const UAPProtocolAddress = getURDProtocolAddress(chainId);

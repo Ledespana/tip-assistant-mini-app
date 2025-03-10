@@ -11,6 +11,8 @@ import { TIP_ASSISTANT_CONFIG } from '@/config';
 import PoweredByBanner from './PoweredBanner';
 import { Title } from './Title';
 import { Info } from 'lucide-react';
+import { utils } from 'ethers';
+import { isAddress } from 'viem';
 
 const ERC725Y_ABI = [
   {
@@ -74,8 +76,28 @@ function Settings({
     return true;
   };
 
+  const validateDestinationAddress = (
+    address: string,
+    contextAddress: string
+  ): boolean => {
+    if (!isAddress(address)) {
+      setErrorMessage('Please enter a valid address.');
+      return false;
+    }
+    if (address.toLowerCase() === contextAddress.toLowerCase()) {
+      setErrorMessage(
+        'Destination address cannot be the same as your current account.'
+      );
+      return false;
+    }
+    setErrorMessage('');
+    return true;
+  };
+
   const handleSave = async () => {
     if (!validateTipPercentage(tipPercentage) || !client) return;
+    if (!validateDestinationAddress(destinationAddress, contextAccounts[0]))
+      return;
     setIsLoading(true);
 
     try {
