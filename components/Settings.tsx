@@ -5,9 +5,10 @@ import {
 } from '@/app/utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
 import { TIP_ASSISTANT_CONFIG } from '@/config';
+import PoweredByBanner from './PoweredBanner';
 
 const ERC725Y_ABI = [
   {
@@ -20,17 +21,20 @@ const ERC725Y_ABI = [
 ];
 
 function Settings({
-  onBack,
   universalTipAssistant,
   loadedDestinationAddress = '',
   loadedPercentageTipped = '',
+  isInitialSetting = false,
+  onBack,
 }: {
-  onBack: () => void;
   universalTipAssistant: string;
   loadedDestinationAddress?: string; // Allow optional props
   loadedPercentageTipped?: string;
+  isInitialSetting?: boolean;
+  onBack: () => void;
 }) {
-  const { publicClient, client, contextAccounts, chain } = useUpProvider();
+  const { publicClient, client, contextAccounts, chain, accounts } =
+    useUpProvider();
   const [destinationAddress, setDestinationAddress] = useState(
     loadedDestinationAddress || ''
   );
@@ -40,6 +44,15 @@ function Settings({
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [displayNoSettings, setDisplayNoSettings] = useState(false);
+
+  useEffect(() => {
+    if (accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
+      setDisplayNoSettings(false);
+    } else {
+      setDisplayNoSettings(true);
+    }
+  }, [accounts, contextAccounts]);
 
   useEffect(() => {
     setDestinationAddress(loadedDestinationAddress || '');
@@ -144,8 +157,106 @@ function Settings({
       console.error('Failed to save config:', error);
     } finally {
       setIsLoading(false);
+      onBack();
     }
   };
+
+  const handleDeactivateAssistant = async () => {
+    if (!client) return;
+    try {
+      // setIsProcessingTransaction(true);
+      const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
+        name,
+        type,
+      }));
+      const latestAssistantConfig = await fetchAssistantConfig({
+        upAddress: contextAccounts[0],
+        assistantAddress: universalTipAssistant,
+        supportedTransactionTypes: [LSP1_TYPE_IDS.LSP0ValueReceived],
+        configParams,
+        publicClient,
+      });
+
+      const updatedTypeConfigAddresses = {
+        ...latestAssistantConfig.typeConfigAddresses,
+      };
+      const dataKeys: string[] = [];
+      const dataValues: string[] = [];
+
+      Object.entries(updatedTypeConfigAddresses).forEach(
+        ([typeId, addresses]) => {
+          const currentAssistantIndex = addresses.findIndex(
+            a => a.toLowerCase() === universalTipAssistant.toLowerCase()
+          );
+          if (currentAssistantIndex !== -1) {
+            addresses.splice(currentAssistantIndex, 1);
+          }
+
+          const typeConfigKey = generateMappingKey('UAPTypeConfig', typeId);
+          if (addresses.length === 0) {
+            dataKeys.push(typeConfigKey);
+            dataValues.push('0x');
+          } else {
+            dataKeys.push(typeConfigKey);
+            dataValues.push(customEncodeAddresses(addresses));
+          }
+        }
+      );
+
+      const assistantConfigKey = generateMappingKey(
+        'UAPExecutiveConfig',
+        universalTipAssistant
+      );
+      dataKeys.push(assistantConfigKey);
+      dataValues.push('0x');
+
+      const txHash = await client.writeContract({
+        address: contextAccounts[0],
+        abi: ERC725Y_ABI,
+        functionName: 'setDataBatch',
+        args: [dataKeys, dataValues],
+        account: contextAccounts[0],
+        chain,
+      });
+
+      await publicClient.waitForTransactionReceipt({ hash: txHash });
+    } catch (err: any) {
+      console.error('Error unsubscribing this assistant', err);
+    } finally {
+      setIsLoading(false);
+      onBack();
+    }
+  };
+
+  if (displayNoSettings) {
+    return (
+      <div style={{ margin: '0 30px' }}>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'PT Mono',
+            fontWeight: 'bold',
+            color: '#243532',
+            marginBottom: '20px',
+          }}
+        >
+          Tip Assistant
+        </div>
+        <div
+          style={{
+            textAlign: 'center',
+            fontFamily: 'PT Mono',
+            color: 'rgb(122 157 184)',
+          }}
+        >
+          <p>The current UP doesn&apos;t have configured the Tip Assistant.</p>
+        </div>
+        <PoweredByBanner />
+      </div>
+    );
+  }
 
   return (
     <div style={{ margin: '0 30px' }}>
@@ -240,27 +351,53 @@ function Settings({
         Save
       </button>
 
-      <button
-        onClick={() => {
-          onBack();
-        }}
-        disabled={isLoading}
-        style={{
-          margin: '5px 0',
-          display: 'block',
-          backgroundColor: '#DB7C3D',
-          fontSize: '12px',
-          width: '100%',
-          color: '#fff',
-          padding: '2px 5px',
-          textAlign: 'center',
-          borderRadius: '5px',
-          fontWeight: 'bold',
-          cursor: 'pointer',
-        }}
-      >
-        Back
-      </button>
+      {!isInitialSetting && (
+        <>
+          <button
+            onClick={() => {
+              onBack();
+            }}
+            disabled={isLoading}
+            style={{
+              margin: '5px 0',
+              display: 'block',
+              backgroundColor: '#DB7C3D',
+              fontSize: '12px',
+              width: '100%',
+              color: '#fff',
+              padding: '2px 5px',
+              textAlign: 'center',
+              borderRadius: '5px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            Back
+          </button>
+
+          <button
+            onClick={handleDeactivateAssistant}
+            disabled={isLoading}
+            style={{
+              margin: '5px 0',
+              display: 'block',
+              backgroundColor: '#DB7C3D',
+              fontSize: '12px',
+              width: '100%',
+              color: '#fff',
+              padding: '2px 5px',
+              textAlign: 'center',
+              borderRadius: '5px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+            }}
+          >
+            {' '}
+            Deactivate Assistant
+          </button>
+        </>
+      )}
+      <PoweredByBanner />
     </div>
   );
 }

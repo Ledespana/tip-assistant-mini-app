@@ -61,9 +61,8 @@ function MainContent() {
         contextAccounts[0],
         protocolAddress
       );
-      debugger;
 
-      // setIsURDInstalled(urdInstalled);
+      setIsURDInstalled(urdInstalled);
     } catch (error) {
       console.error('Error checking assistant installation', error);
       // setError("Failed to check assistant installation");
@@ -158,12 +157,13 @@ function MainContent() {
     );
   }
 
-  if (shouldDisplaySettings) {
+  if (shouldDisplaySettings || (isURDInstalled && !isUPSubscribedToAssistant)) {
     return (
       <Settings
         universalTipAssistant={universalTipAssistant}
         loadedDestinationAddress={destinationAddress}
         loadedPercentageTipped={percentageTipped}
+        isInitialSetting={isURDInstalled && !isUPSubscribedToAssistant}
         onBack={backFromSettings}
       />
     );
