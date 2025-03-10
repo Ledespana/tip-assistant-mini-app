@@ -5,7 +5,7 @@ import {
 } from '@/app/utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
 import { TIP_ASSISTANT_CONFIG } from '@/config';
 import PoweredByBanner from './PoweredBanner';

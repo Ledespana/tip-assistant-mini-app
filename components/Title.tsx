@@ -45,7 +45,7 @@ export const Title = () => {
             zIndex: 100,
           }}
         >
-          To manage the other Assistants or unistall the protocol completly go
+          To manage the other Assistants or uninstall the protocol completly go
           to {'\n'}
           https://upassistants.com
         </div>

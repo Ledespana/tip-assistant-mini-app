@@ -1,12 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
 import { SiweMessage } from 'siwe';
-import {
-  createWalletClient,
-  http,
-  encodeAbiParameters,
-  getContract,
-} from 'viem';
 import { verifyMessage } from 'ethers';
 import { subscribeToUapURD, updateBECPermissions } from '@/app/utils';
 import { getURDProtocolAddress } from '@/config';
@@ -28,10 +22,6 @@ export const NoAssistant = () => {
   } = useUpProvider();
   const [displaySettings, setDisplaySettings] = useState(false);
   const [mainController, setMainController] = useState('');
-  const [arePermssionsSet, setArePermssionsSet] = useState(false);
-  const [isURDInstalled, setIsURDInstalled] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
 
   useEffect(() => {
     if (!walletConnected) return;
@@ -127,7 +117,7 @@ export const NoAssistant = () => {
 
   return (
     <div>
-      <h1>Tip Assistant not installed</h1>
+      <h1 style={{ marginTop: '20px' }}>Tip Assistant not installed</h1>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
         {displaySettings && (
           <button
