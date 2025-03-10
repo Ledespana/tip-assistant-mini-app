@@ -11,7 +11,6 @@ import { TIP_ASSISTANT_CONFIG } from '@/config';
 import PoweredByBanner from './PoweredBanner';
 import { Title } from './Title';
 import { Info } from 'lucide-react';
-import { utils } from 'ethers';
 import { isAddress } from 'viem';
 
 const ERC725Y_ABI = [
