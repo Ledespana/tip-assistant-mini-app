@@ -38,6 +38,7 @@ export const Title = () => {
             left: '50%',
             transform: 'translateX(-50%)',
             backgroundColor: '#1b2832',
+            fontFamily: 'PT Mono',
             color: 'white',
             padding: '10px',
             borderRadius: '5px',

@@ -321,6 +321,7 @@ function Settings({
         {showPopover && (
           <div
             style={{
+              fontWeight: 'normal',
               position: 'absolute',
               top: '130px',
               left: '40%',
