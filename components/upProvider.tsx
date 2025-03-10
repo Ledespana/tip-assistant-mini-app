@@ -11,8 +11,7 @@
  * - accounts: Array of connected wallet addresses
  * - contextAccounts: Array of Universal Profile accounts
  * - walletConnected: Boolean indicating active wallet connection
- * - selectedAddress: Currently selected address for transactions
- * - isSearching: Loading state indicator
+ * - universalTipAssistant: Address of the Universal Tip Assistant for the current chain
  */
 'use client';
 
@@ -45,10 +44,6 @@ interface UpProviderContext {
   accounts: Array<`0x${string}`>;
   contextAccounts: Array<`0x${string}`>;
   walletConnected: boolean;
-  selectedAddress: `0x${string}` | null;
-  setSelectedAddress: (address: `0x${string}` | null) => void;
-  isSearching: boolean;
-  setIsSearching: (isSearching: boolean) => void;
   universalTipAssistant: string;
 }
 
@@ -76,10 +71,6 @@ export function UpProvider({ children }: UpProviderProps) {
     []
   );
   const [walletConnected, setWalletConnected] = useState(false);
-  const [selectedAddress, setSelectedAddress] = useState<`0x${string}` | null>(
-    null
-  );
-  const [isSearching, setIsSearching] = useState(false);
   const [client, setClient] = useState<WalletClient | null>(null);
   const [universalTipAssistant, setUniversalTipAssistant] = useState('');
   const chain = chainId === 42 ? lukso : luksoTestnet;
@@ -161,7 +152,6 @@ export function UpProvider({ children }: UpProviderProps) {
   return (
     <UpContext.Provider
       value={{
-        // todo refactor
         provider,
         client,
         publicClient,
@@ -170,10 +160,6 @@ export function UpProvider({ children }: UpProviderProps) {
         accounts,
         contextAccounts,
         walletConnected,
-        selectedAddress,
-        setSelectedAddress,
-        isSearching,
-        setIsSearching,
         universalTipAssistant,
       }}
     >
