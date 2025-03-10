@@ -211,8 +211,9 @@ function MainContent() {
             }}
           >
             <p>
-              The Executive Assistant that automatically channels your receiving
-              LYX transaction to tip third party UP accounts.
+              An Executive Assistant that automatically takes a specified % of
+              all LYX you receive and tips a Universal Profile of your choosing
+              with it.
             </p>
             <br />
             <p>Connect your wallet to continue.</p>

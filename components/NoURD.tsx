@@ -143,8 +143,21 @@ export const NoURD = ({ onInstall }: { onInstall: () => void }) => {
 
   return (
     <div>
-      <h1 style={{ marginTop: '20px' }}>Tip Assistant not installed</h1>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div
+        style={{ display: 'flex', flexDirection: 'column', marginTop: '20px' }}
+      >
+        {!displaySettings && (
+          <div
+            style={{
+              margin: `0 20px`,
+              textAlign: 'center',
+              fontFamily: 'PT Mono',
+              color: 'rgb(122 157 184)',
+            }}
+          >
+            The owner of the grid has not configured the Tip Assistant yet.
+          </div>
+        )}
         {displaySettings && (
           <button
             onClick={sign}
