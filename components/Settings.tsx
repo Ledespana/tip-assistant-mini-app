@@ -337,11 +337,6 @@ function Settings({
       {successMessage && (
         <p style={{ color: 'green', fontSize: '12px' }}>{successMessage}</p>
       )}
-      {isLoading && (
-        <p style={{ color: 'blue', fontSize: '12px' }}>
-          Processing transaction...
-        </p>
-      )}
 
       <button
         onClick={handleSave}
@@ -360,7 +355,7 @@ function Settings({
           cursor: 'pointer',
         }}
       >
-        Save
+        {isLoading ? 'Saving...' : 'Save'}
       </button>
 
       {!isInitialSetting && (
@@ -376,9 +371,7 @@ function Settings({
           }}
         >
           <button
-            onClick={() => {
-              onBack();
-            }}
+            onClick={onBack}
             disabled={isLoading}
             style={{
               margin: '5px 0',
@@ -414,8 +407,7 @@ function Settings({
               cursor: 'pointer',
             }}
           >
-            {' '}
-            Deactivate Assistant
+            {isLoading ? 'Deactivating...' : 'Deactivate Assistant'}
           </button>
         </div>
       )}
