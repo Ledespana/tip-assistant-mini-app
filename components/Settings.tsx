@@ -352,7 +352,17 @@ function Settings({
       </button>
 
       {!isInitialSetting && (
-        <>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            fontFamily: 'PT Mono',
+            fontWeight: 'bold',
+            color: '#243532',
+            marginBottom: '20px',
+          }}
+        >
           <button
             onClick={() => {
               onBack();
@@ -363,18 +373,18 @@ function Settings({
               display: 'block',
               backgroundColor: '#DB7C3D',
               fontSize: '12px',
-              width: '100%',
+              width: '50%',
               color: '#fff',
               padding: '2px 5px',
               textAlign: 'center',
               borderRadius: '5px',
               fontWeight: 'bold',
               cursor: 'pointer',
+              marginRight: '5px',
             }}
           >
             Back
           </button>
-
           <button
             onClick={handleDeactivateAssistant}
             disabled={isLoading}
@@ -383,7 +393,7 @@ function Settings({
               display: 'block',
               backgroundColor: '#DB7C3D',
               fontSize: '12px',
-              width: '100%',
+              width: '50%',
               color: '#fff',
               padding: '2px 5px',
               textAlign: 'center',
@@ -395,7 +405,7 @@ function Settings({
             {' '}
             Deactivate Assistant
           </button>
-        </>
+        </div>
       )}
       <PoweredByBanner />
     </div>
