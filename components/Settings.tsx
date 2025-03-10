@@ -323,7 +323,7 @@ function Settings({
           <div
             style={{
               position: 'absolute',
-              top: '140px',
+              top: '130px',
               left: '40%',
               transform: 'translateX(-50%)',
               backgroundColor: '#1b2832',
@@ -334,8 +334,8 @@ function Settings({
               zIndex: 100,
             }}
           >
-            Every incoming LYX transaction will send the destination address a %
-            of the total amount.
+            The Tip Assistant will send this percentage of the total amount from
+            any incoming LYX transaction to the destination wallet.
           </div>
         )}
       </label>
