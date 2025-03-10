@@ -177,7 +177,7 @@ export function UpProvider({ children }: UpProviderProps) {
         universalTipAssistant,
       }}
     >
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-start justify-center">
         {children}
       </div>
     </UpContext.Provider>

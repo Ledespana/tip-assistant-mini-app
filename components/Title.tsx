@@ -26,7 +26,7 @@ export const Title = () => {
           color: 'rgb(54 80 99 / 0.6)',
           height: '15px',
           width: '15px',
-          margin: '4px 0 0 3px',
+          margin: '3px 0 0 3px',
         }}
         onClick={() => setShowPopover(!showPopover)}
       />
@@ -34,7 +34,7 @@ export const Title = () => {
         <div
           style={{
             position: 'absolute',
-            top: '40px',
+            top: '30px',
             left: '50%',
             transform: 'translateX(-50%)',
             backgroundColor: '#1b2832',
@@ -45,7 +45,7 @@ export const Title = () => {
             zIndex: 100,
           }}
         >
-          To manage the rest of Assistants or unistall the protocol completly go
+          To manage the other Assistants or unistall the protocol completly go
           to {'\n'}
           https://upassistants.com
         </div>

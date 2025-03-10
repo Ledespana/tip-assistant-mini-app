@@ -126,23 +126,32 @@ function MainContent() {
 
   if (!client || !walletConnected) {
     return (
-      <div style={{ margin: '0 20px' }}>
+      <div
+        style={{
+          margin: '0 20px',
+          display: 'flex',
+          justifyContent: 'flex-start',
+          flexDirection: 'column',
+        }}
+      >
         <Title />
-
-        <div
-          style={{
-            textAlign: 'center',
-            fontFamily: 'PT Mono',
-            color: 'rgb(122 157 184)',
-          }}
-        >
-          <p>
-            The Executive Assistant that automatically channels your receiving
-            LYX transaction to tip third party UP accounts.
-          </p>
-          <p>Connect your wallet to continue.</p>
+        <div>
+          <div
+            style={{
+              marginTop: '20px',
+              textAlign: 'center',
+              fontFamily: 'PT Mono',
+              color: 'rgb(122 157 184)',
+            }}
+          >
+            <p>
+              The Executive Assistant that automatically channels your receiving
+              LYX transaction to tip third party UP accounts.
+            </p>
+            <p>Connect your wallet to continue.</p>
+          </div>
+          <PoweredByBanner />
         </div>
-        <PoweredByBanner />
       </div>
     );
   }

@@ -235,6 +235,7 @@ function Settings({
         <Title />
         <div
           style={{
+            marginTop: '0',
             textAlign: 'center',
             fontFamily: 'PT Mono',
             color: 'rgb(122 157 184)',
@@ -249,7 +250,9 @@ function Settings({
 
   return (
     <div style={{ margin: '0 30px' }}>
-      <Title />
+      <div style={{ marginBottom: '10px' }}>
+        <Title />
+      </div>
       <label
         style={{
           fontWeight: 'bold',
@@ -337,7 +340,7 @@ function Settings({
             fontFamily: 'PT Mono',
             fontWeight: 'bold',
             color: '#243532',
-            marginBottom: '20px',
+            marginBottom: '10px',
           }}
         >
           <button
