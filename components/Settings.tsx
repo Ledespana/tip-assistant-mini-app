@@ -264,7 +264,7 @@ function Settings({
             color: 'rgb(122 157 184)',
           }}
         >
-          <p>The current UP doesn&apos;t have configured the Tip Assistant.</p>
+          <p>The owner of the grid has not configured the Tip Assistant yet.</p>
         </div>
         <PoweredByBanner />
       </div>
