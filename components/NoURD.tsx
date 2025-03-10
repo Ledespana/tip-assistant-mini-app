@@ -5,7 +5,7 @@ import { verifyMessage } from 'ethers';
 import { subscribeToUapURD, updateBECPermissions } from '@/app/utils';
 import { getURDProtocolAddress } from '@/config';
 
-export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
+export const NoURD = ({ onInstall }: { onInstall: () => void }) => {
   const {
     accounts,
     contextAccounts,

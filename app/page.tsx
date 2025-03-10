@@ -3,7 +3,6 @@
 import { UpProvider } from '@/components/upProvider';
 import { useUpProvider } from '@/components/upProvider';
 import { useState, useEffect, useCallback } from 'react';
-import { NoAssistant } from '@/components/NoAssistant';
 import PoweredByBanner from '@/components/PoweredBanner';
 import Settings from '@/components/Settings';
 import { getURDProtocolAddress, TIP_ASSISTANT_CONFIG } from '@/config';
@@ -11,6 +10,7 @@ import { LuksoProfile } from '@/components/LuksoProfile';
 import { fetchAssistantConfig, isUAPInstalled } from './utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { Title } from '@/components/Title';
+import { NoURD } from '@/components/NoURD';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -53,7 +53,7 @@ function MainContent() {
   }, []);
 
   const checkURDInstalled = useCallback(async () => {
-    if (!client || !walletConnected) return;
+    if (!client || !accounts.length) return;
 
     try {
       const protocolAddress = getURDProtocolAddress(chainId);
@@ -105,10 +105,10 @@ function MainContent() {
   };
 
   useEffect(() => {
-    if (!client || !walletConnected) return;
+    if (!client && !contextAccounts.length ) return;
     fetchAndUpdateAssistantConfig();
     checkURDInstalled();
-  }, [accounts, publicClient, walletConnected]);
+  }, [contextAccounts, publicClient]);
 
   const backFromSettings = async () => {
     await fetchAndUpdateAssistantConfig();
@@ -127,7 +127,71 @@ function MainContent() {
     return <div>Loading...</div>;
   }
 
-  if (!client || !walletConnected) {
+  // if Assistant is not configured
+  if (!isURDInstalled && walletConnected) {
+    return (
+      <div>
+        <Title />
+        <NoURD onInstall={onURDInstalled} />
+        <PoweredByBanner />
+      </div>
+    );
+  }
+
+  // after click on settintgs or initial configure after installing URD
+  if (shouldDisplaySettings || (isURDInstalled && !isUPSubscribedToAssistant)) {
+    return (
+      <Settings
+        universalTipAssistant={universalTipAssistant}
+        loadedDestinationAddress={destinationAddress}
+        loadedPercentageTipped={percentageTipped}
+        isInitialSetting={isURDInstalled && !isUPSubscribedToAssistant}
+        onBack={backFromSettings}
+      />
+    );
+  }
+
+  // if Assistant is configure even if wallet is not connected
+  if (isUPSubscribedToAssistant) {
+    return (
+      <div>
+      <Title />
+      <LuksoProfile
+        address={destinationAddress}
+        percentageTipped={percentageTipped}
+      />
+
+      {walletConnected && contextAccounts[0].toLowerCase() === accounts[0].toLowerCase() && (
+        <button
+          style={{
+            margin: '5px 0',
+            display: 'block',
+            backgroundColor: '#DB7C3D',
+            fontSize: '12px',
+            width: '100%',
+            color: '#fff',
+            padding: '2px 5px',
+            textAlign: 'center',
+            borderRadius: '5px',
+            textDecoration: 'none',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+          }}
+          onClick={() => setShouldDisplaySettings(true)}
+        >
+          Settings
+        </button>
+      )}
+      <PoweredByBanner />
+    </div>
+    )
+
+    }
+
+  //if Assistant is not configured, or URD is not configured and no wallet
+  return (
+    <>
     return (
       <div
         style={{
@@ -151,69 +215,13 @@ function MainContent() {
               The Executive Assistant that automatically channels your receiving
               LYX transaction to tip third party UP accounts.
             </p>
+            <br/>
             <p>Connect your wallet to continue.</p>
           </div>
           <PoweredByBanner />
         </div>
       </div>
     );
-  }
-
-  if (shouldDisplaySettings || (isURDInstalled && !isUPSubscribedToAssistant)) {
-    return (
-      <Settings
-        universalTipAssistant={universalTipAssistant}
-        loadedDestinationAddress={destinationAddress}
-        loadedPercentageTipped={percentageTipped}
-        isInitialSetting={isURDInstalled && !isUPSubscribedToAssistant}
-        onBack={backFromSettings}
-      />
-    );
-  }
-
-  if (!isUPSubscribedToAssistant) {
-    return (
-      <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
-        <Title />
-        <NoAssistant onInstall={onURDInstalled} />
-        <PoweredByBanner />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div>
-        <Title />
-        <LuksoProfile
-          address={destinationAddress}
-          percentageTipped={percentageTipped}
-        />
-
-        {contextAccounts[0].toLowerCase() === accounts[0].toLowerCase() && (
-          <button
-            style={{
-              margin: '5px 0',
-              display: 'block',
-              backgroundColor: '#DB7C3D',
-              fontSize: '12px',
-              width: '100%',
-              color: '#fff',
-              padding: '2px 5px',
-              textAlign: 'center',
-              borderRadius: '5px',
-              textDecoration: 'none',
-              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-            }}
-            onClick={() => setShouldDisplaySettings(true)}
-          >
-            Settings
-          </button>
-        )}
-        <PoweredByBanner />
-      </div>
     </>
   );
 }

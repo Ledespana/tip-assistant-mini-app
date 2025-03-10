@@ -50,7 +50,7 @@ function Settings({
   const [showPopover, setShowPopover] = useState(false);
 
   useEffect(() => {
-    if (accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
+    if (accounts.length && accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
       setDisplayNoSettings(false);
     } else {
       setDisplayNoSettings(true);
