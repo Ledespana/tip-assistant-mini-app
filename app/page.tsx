@@ -66,7 +66,6 @@ function MainContent() {
       setIsURDInstalled(urdInstalled);
     } catch (error) {
       console.error('Error checking assistant installation', error);
-      // setError("Failed to check assistant installation");
     }
   }, [client, walletConnected, contextAccounts, chainId]);
 
@@ -114,6 +113,10 @@ function MainContent() {
   const backFromSettings = async () => {
     await fetchAndUpdateAssistantConfig();
     setShouldDisplaySettings(false);
+  };
+
+  const onURDInstalled = async () => {
+    setIsURDInstalled(true);
   };
 
   if (!mounted) {
@@ -168,15 +171,19 @@ function MainContent() {
     );
   }
 
-  return (
-    <>
+  if (!isUPSubscribedToAssistant) {
+    return (
       <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
         <Title />
-        <NoAssistant />
+        <NoAssistant onInstall={onURDInstalled} />
         <PoweredByBanner />
       </div>
+    );
+  }
 
-      <div className={`${!isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
+  return (
+    <>
+      <div>
         <Title />
         <LuksoProfile
           address={destinationAddress}

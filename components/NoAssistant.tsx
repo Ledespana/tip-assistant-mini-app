@@ -5,7 +5,7 @@ import { verifyMessage } from 'ethers';
 import { subscribeToUapURD, updateBECPermissions } from '@/app/utils';
 import { getURDProtocolAddress } from '@/config';
 
-export const NoAssistant = () => {
+export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
   const {
     accounts,
     contextAccounts,
@@ -29,11 +29,11 @@ export const NoAssistant = () => {
   const sign = async (): Promise<boolean> => {
     try {
       if (!client || !accounts.length || !accounts[0]) return false; // Explicitly check accounts[0]
-  
+
       const userAddress: `0x${string}` = accounts[0];
-  
+
       setIsLoadingTransaction(true);
-  
+
       const siweMessage = new SiweMessage({
         domain: window.location.host,
         uri: window.location.origin,
@@ -46,10 +46,13 @@ export const NoAssistant = () => {
 
       const signature = await client.request({
         method: 'personal_sign',
-        params: [siweMessage, userAddress], 
+        params: [siweMessage, userAddress],
       });
-  
-      const mainUPController = await verifyMessage(siweMessage, signature as string);
+
+      const mainUPController = await verifyMessage(
+        siweMessage,
+        signature as string
+      );
       setMainController(mainUPController);
       return true;
     } catch (error: any) {
@@ -81,7 +84,13 @@ export const NoAssistant = () => {
     if (!mainController) return;
     setIsLoadingTransaction(true);
     try {
-      await updateBECPermissions(client, publicClient, accounts[0], mainController, ERC725Y_ABI);
+      await updateBECPermissions(
+        client,
+        publicClient,
+        accounts[0],
+        mainController,
+        ERC725Y_ABI
+      );
       setHasExtensionPermissions(true);
     } catch (error) {
       console.error('Error updating permissions:', error);
@@ -96,9 +105,13 @@ export const NoAssistant = () => {
       const UAPProtocolAddress = getURDProtocolAddress(chainId);
       await subscribeToUapURD(client, accounts[0], UAPProtocolAddress);
     } catch (error) {
-      console.error('Error subscribing to UAP Universal Receiver Delegate', error);
+      console.error(
+        'Error subscribing to UAP Universal Receiver Delegate',
+        error
+      );
     } finally {
       setIsLoadingTransaction(false);
+      onInstall();
     }
   };
 
@@ -142,8 +155,16 @@ export const NoAssistant = () => {
         {displaySettings && (
           <button
             onClick={handleInstallUAP}
-            disabled={isLoadingTransaction || !mainController || !hasExtensionPermissions}
-            style={getButtonStyle(isLoadingTransaction || !mainController || !hasExtensionPermissions)}
+            disabled={
+              isLoadingTransaction ||
+              !mainController ||
+              !hasExtensionPermissions
+            }
+            style={getButtonStyle(
+              isLoadingTransaction ||
+                !mainController ||
+                !hasExtensionPermissions
+            )}
           >
             {isLoadingTransaction ? 'Loading...' : '3- Install UAP Protocol'}
           </button>
