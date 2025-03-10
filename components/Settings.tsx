@@ -5,11 +5,13 @@ import {
 } from '@/app/utils';
 import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
 import { AbiCoder } from 'ethers';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
 import { TIP_ASSISTANT_CONFIG } from '@/config';
 import PoweredByBanner from './PoweredBanner';
 import { Title } from './Title';
+import { Info } from 'lucide-react';
+import { isAddress } from 'viem';
 
 const ERC725Y_ABI = [
   {
@@ -44,11 +46,14 @@ function Settings({
   );
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [displayNoSettings, setDisplayNoSettings] = useState(false);
+  const [showPopover, setShowPopover] = useState(false);
 
   useEffect(() => {
-    if (accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
+    if (
+      accounts.length &&
+      accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()
+    ) {
       setDisplayNoSettings(false);
     } else {
       setDisplayNoSettings(true);
@@ -70,10 +75,29 @@ function Settings({
     return true;
   };
 
+  const validateDestinationAddress = (
+    address: string,
+    contextAddress: string
+  ): boolean => {
+    if (!isAddress(address)) {
+      setErrorMessage('Please enter a valid address.');
+      return false;
+    }
+    if (address.toLowerCase() === contextAddress.toLowerCase()) {
+      setErrorMessage(
+        'Destination address cannot be the same as your current account.'
+      );
+      return false;
+    }
+    setErrorMessage('');
+    return true;
+  };
+
   const handleSave = async () => {
     if (!validateTipPercentage(tipPercentage) || !client) return;
+    if (!validateDestinationAddress(destinationAddress, contextAccounts[0]))
+      return;
     setIsLoading(true);
-    setSuccessMessage('');
 
     try {
       // 1) Load existing config
@@ -153,19 +177,18 @@ function Settings({
       });
 
       await publicClient.waitForTransactionReceipt({ hash: txHash });
-      setSuccessMessage('Transaction successful!');
-    } catch (error) {
-      console.error('Failed to save config:', error);
-    } finally {
       setIsLoading(false);
       onBack();
+    } catch (error) {
+      console.error('Failed to save config:', error);
+      setIsLoading(false);
     }
   };
 
   const handleDeactivateAssistant = async () => {
     if (!client) return;
+    setIsLoading(true);
     try {
-      // setIsProcessingTransaction(true);
       const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
         name,
         type,
@@ -221,11 +244,11 @@ function Settings({
       });
 
       await publicClient.waitForTransactionReceipt({ hash: txHash });
-    } catch (err: any) {
-      console.error('Error unsubscribing this assistant', err);
-    } finally {
       setIsLoading(false);
       onBack();
+    } catch (err: any) {
+      console.error('Error unsubscribing this assistant', err);
+      setIsLoading(false);
     }
   };
 
@@ -241,7 +264,7 @@ function Settings({
             color: 'rgb(122 157 184)',
           }}
         >
-          <p>The current UP doesn&apos;t have configured the Tip Assistant.</p>
+          <p>The owner of the grid has not configured the Tip Assistant yet.</p>
         </div>
         <PoweredByBanner />
       </div>
@@ -281,9 +304,39 @@ function Settings({
           fontWeight: 'bold',
           color: 'rgb(122 157 184)',
           fontFamily: 'PT Mono',
+          display: 'flex',
         }}
       >
         Percentage of LYX to Tip
+        <Info
+          style={{
+            cursor: 'pointer',
+            color: 'rgb(54 80 99 / 0.6)',
+            height: '15px',
+            width: '15px',
+            margin: '5px 0 0 3px',
+          }}
+          onClick={() => setShowPopover(!showPopover)}
+        />
+        {showPopover && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '130px',
+              left: '40%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#1b2832',
+              color: 'white',
+              padding: '10px',
+              borderRadius: '5px',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+              zIndex: 100,
+            }}
+          >
+            The Tip Assistant will send this percentage of the total amount from
+            any incoming LYX transaction to the destination wallet.
+          </div>
+        )}
       </label>
       <input
         type="text"
@@ -302,15 +355,6 @@ function Settings({
       {errorMessage && (
         <p style={{ color: 'red', fontSize: '12px' }}>{errorMessage}</p>
       )}
-      {successMessage && (
-        <p style={{ color: 'green', fontSize: '12px' }}>{successMessage}</p>
-      )}
-      {isLoading && (
-        <p style={{ color: 'blue', fontSize: '12px' }}>
-          Processing transaction...
-        </p>
-      )}
-
       <button
         onClick={handleSave}
         disabled={isLoading}
@@ -328,7 +372,7 @@ function Settings({
           cursor: 'pointer',
         }}
       >
-        Save
+        {isLoading ? 'Saving...' : 'Save'}
       </button>
 
       {!isInitialSetting && (
@@ -344,9 +388,7 @@ function Settings({
           }}
         >
           <button
-            onClick={() => {
-              onBack();
-            }}
+            onClick={onBack}
             disabled={isLoading}
             style={{
               margin: '5px 0',
@@ -382,8 +424,7 @@ function Settings({
               cursor: 'pointer',
             }}
           >
-            {' '}
-            Deactivate Assistant
+            {isLoading ? 'Deactivating...' : 'Deactivate Assistant'}
           </button>
         </div>
       )}

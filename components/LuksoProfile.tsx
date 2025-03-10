@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { ERC725 } from '@erc725/erc725.js';
 import erc725schema from '@erc725/erc725.js/schemas/LSP3ProfileMetadata.json';
 import { useUpProvider } from './upProvider';
+import { formatAddress } from '@/app/utils';
 
 // Constants for the IPFS gateway and RPC endpoint for the LUKSO testnet
 const IPFS_GATEWAY = 'https://api.universalprofile.cloud/ipfs/';
@@ -41,7 +42,7 @@ export function LuksoProfile({ address, percentageTipped }: LuksoProfileProps) {
   }>({
     imgUrl:
       'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp', // todo change default files
-    fullName: 'username',
+    fullName: '',
     background:
       'https://tools-web-components.pages.dev/images/sample-background.jpg',
     profileAddress: '0x1234567890111213141516171819202122232425',
@@ -85,8 +86,7 @@ export function LuksoProfile({ address, percentageTipped }: LuksoProfileProps) {
           };
           setProfileData(data);
         }
-      } catch (error) {
-        console.error('Error fetching profile image:', error);
+      } catch {
         setProfileData(prev => ({
           ...prev,
           isLoading: false,
@@ -108,14 +108,17 @@ export function LuksoProfile({ address, percentageTipped }: LuksoProfileProps) {
       height={200}
     >
       <div slot="content" className="flex flex-col items-center">
-        {!profileData.isLoading && (
+        {!profileData.isLoading && profileData.fullName && (
           <lukso-username
-            name={profileData.fullName}
+            name={profileData.fullName || profileData.profileAddress}
             address={profileData.profileAddress}
             size="large"
             max-width="200"
             prefix="@"
           ></lukso-username>
+        )}
+        {!profileData.isLoading && !profileData.fullName && (
+          <div title={address}>{formatAddress(address)}</div>
         )}
         <div
           style={{
