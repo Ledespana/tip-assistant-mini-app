@@ -10,6 +10,7 @@ import { useUpProvider } from './upProvider';
 import { TIP_ASSISTANT_CONFIG } from '@/config';
 import PoweredByBanner from './PoweredBanner';
 import { Title } from './Title';
+import { Info } from 'lucide-react';
 
 const ERC725Y_ABI = [
   {
@@ -46,6 +47,7 @@ function Settings({
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [displayNoSettings, setDisplayNoSettings] = useState(false);
+  const [showPopover, setShowPopover] = useState(false);
 
   useEffect(() => {
     if (accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
@@ -281,9 +283,39 @@ function Settings({
           fontWeight: 'bold',
           color: 'rgb(122 157 184)',
           fontFamily: 'PT Mono',
+          display: 'flex',
         }}
       >
         Percentage of LYX to Tip
+        <Info
+          style={{
+            cursor: 'pointer',
+            color: 'rgb(54 80 99 / 0.6)',
+            height: '15px',
+            width: '15px',
+            margin: '5px 0 0 3px',
+          }}
+          onClick={() => setShowPopover(!showPopover)}
+        />
+        {showPopover && (
+          <div
+            style={{
+              position: 'absolute',
+              top: '140px',
+              left: '40%',
+              transform: 'translateX(-50%)',
+              backgroundColor: '#1b2832',
+              color: 'white',
+              padding: '10px',
+              borderRadius: '5px',
+              boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
+              zIndex: 100,
+            }}
+          >
+            Every incoming LYX transaction will send the destination address a %
+            of the total amount.
+          </div>
+        )}
       </label>
       <input
         type="text"

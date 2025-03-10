@@ -26,7 +26,7 @@ export const Title = () => {
           color: 'rgb(54 80 99 / 0.6)',
           height: '15px',
           width: '15px',
-          margin: '2px 0 0 3px',
+          margin: '1px 0 0 3px',
         }}
         onClick={() => setShowPopover(!showPopover)}
       />

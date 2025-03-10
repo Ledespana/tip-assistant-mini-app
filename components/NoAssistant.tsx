@@ -18,21 +18,25 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
   const [mainController, setMainController] = useState('');
   const [isLoadingTransaction, setIsLoadingTransaction] = useState(false);
   const [hasExtensionPermissions, setHasExtensionPermissions] = useState(false);
+  const [stepCompleted, setStepCompleted] = useState({
+    step1: false,
+    step2: false,
+    step3: false,
+  });
 
   useEffect(() => {
     if (!walletConnected) return;
     setDisplaySettings(
-      accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()
+      accounts[0]?.toLowerCase() === contextAccounts[0]?.toLowerCase()
     );
   }, [accounts, contextAccounts, walletConnected]);
 
   const sign = async (): Promise<boolean> => {
     try {
-      if (!client || !accounts.length || !accounts[0]) return false; // Explicitly check accounts[0]
-
-      const userAddress: `0x${string}` = accounts[0];
+      if (!client || !accounts.length || !accounts[0]) return false;
 
       setIsLoadingTransaction(true);
+      const userAddress: `0x${string}` = accounts[0];
 
       const siweMessage = new SiweMessage({
         domain: window.location.host,
@@ -54,6 +58,7 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
         signature as string
       );
       setMainController(mainUPController);
+      setStepCompleted(prev => ({ ...prev, step1: true })); // Mark Step 1 as done
       return true;
     } catch (error: any) {
       console.error('ProfileProvider: Error', error);
@@ -92,6 +97,7 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
         ERC725Y_ABI
       );
       setHasExtensionPermissions(true);
+      setStepCompleted(prev => ({ ...prev, step2: true })); // Mark Step 2 as done
     } catch (error) {
       console.error('Error updating permissions:', error);
     } finally {
@@ -104,6 +110,8 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
     try {
       const UAPProtocolAddress = getURDProtocolAddress(chainId);
       await subscribeToUapURD(client, accounts[0], UAPProtocolAddress);
+      setStepCompleted(prev => ({ ...prev, step3: true })); // Mark Step 3 as done
+      onInstall();
     } catch (error) {
       console.error(
         'Error subscribing to UAP Universal Receiver Delegate',
@@ -111,13 +119,14 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
       );
     } finally {
       setIsLoadingTransaction(false);
-      onInstall();
     }
   };
 
   const getButtonStyle = (disabled: boolean): CSSProperties => ({
     margin: '5px 0',
-    display: 'block',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: disabled ? '#B0B0B0' : '#DB7C3D',
     fontSize: '12px',
     width: '100%',
@@ -141,6 +150,9 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
             style={getButtonStyle(isLoadingTransaction)}
           >
             {isLoadingTransaction ? 'Loading...' : '1- Sign'}
+            {stepCompleted.step1 && (
+              <span style={{ marginLeft: '10px' }}>✅</span>
+            )}
           </button>
         )}
         {displaySettings && (
@@ -150,6 +162,9 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
             style={getButtonStyle(isLoadingTransaction || !mainController)}
           >
             {isLoadingTransaction ? 'Loading...' : '2- Add Permissions'}
+            {stepCompleted.step2 && (
+              <span style={{ marginLeft: '10px' }}>✅</span>
+            )}
           </button>
         )}
         {displaySettings && (
@@ -167,6 +182,9 @@ export const NoAssistant = ({ onInstall }: { onInstall: () => void }) => {
             )}
           >
             {isLoadingTransaction ? 'Loading...' : '3- Install UAP Protocol'}
+            {stepCompleted.step3 && (
+              <span style={{ marginLeft: '10px' }}>✅</span>
+            )}
           </button>
         )}
       </div>
