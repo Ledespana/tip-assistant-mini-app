@@ -1,9 +1,6 @@
-import { Info } from 'lucide-react';
-import { useState } from 'react';
 import { useUpProvider } from './upProvider';
 
 const PoweredByBanner = () => {
-  const [showPopover, setShowPopover] = useState(false);
   const { chainId } = useUpProvider();
 
   const generateLink = () => {
@@ -22,35 +19,6 @@ const PoweredByBanner = () => {
         marginTop: '10px',
       }}
     >
-      <Info
-        style={{
-          cursor: 'pointer',
-          color: 'rgb(54 80 99 / 0.6)',
-          height: '20px',
-          width: '20px',
-          margin: '6px 0 0 0',
-        }}
-        onClick={() => setShowPopover(!showPopover)}
-      />
-      {showPopover && (
-        <div
-          style={{
-            position: 'absolute',
-            top: '80px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            backgroundColor: '#1b2832',
-            color: 'white',
-            padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0px 4px 6px rgba(0, 0, 0, 0.1)',
-            zIndex: 100,
-          }}
-        >
-          Add this app to your Grid:{'\n'}
-          https://tip-assistant-grid-app.netlify.app
-        </div>
-      )}
       <a
         href={generateLink()}
         target="_blank"

@@ -9,6 +9,7 @@ import { use, useEffect, useState } from 'react';
 import { useUpProvider } from './upProvider';
 import { TIP_ASSISTANT_CONFIG } from '@/config';
 import PoweredByBanner from './PoweredBanner';
+import { Title } from './Title';
 
 const ERC725Y_ABI = [
   {
@@ -113,7 +114,7 @@ function Settings({
             currentTypeAddresses.push(universalTipAssistant);
           }
         } else {
-          // todo, in theory not possible on Tip assistant V1
+          //  in theory not possible on Tip assistant V1
           if (currentAssistantIndex !== -1) {
             currentTypeAddresses.splice(currentAssistantIndex, 1);
           }
@@ -231,19 +232,7 @@ function Settings({
   if (displayNoSettings) {
     return (
       <div style={{ margin: '0 30px' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: 'PT Mono',
-            fontWeight: 'bold',
-            color: '#243532',
-            marginBottom: '20px',
-          }}
-        >
-          Tip Assistant
-        </div>
+        <Title />
         <div
           style={{
             textAlign: 'center',
@@ -260,19 +249,7 @@ function Settings({
 
   return (
     <div style={{ margin: '0 30px' }}>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontFamily: 'PT Mono',
-          fontWeight: 'bold',
-          color: '#243532',
-          marginBottom: '20px',
-        }}
-      >
-        Tip Assistant
-      </div>
+      <Title />
       <label
         style={{
           fontWeight: 'bold',

@@ -9,7 +9,8 @@ import Settings from '@/components/Settings';
 import { getURDProtocolAddress, TIP_ASSISTANT_CONFIG } from '@/config';
 import { LuksoProfile } from '@/components/LuksoProfile';
 import { fetchAssistantConfig, isUAPInstalled } from './utils';
-import { ERC725YDataKeys, LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import { LSP1_TYPE_IDS } from '@lukso/lsp-smart-contracts';
+import { Title } from '@/components/Title';
 
 // Import the LUKSO web-components library
 let promise: Promise<unknown> | null = null;
@@ -126,19 +127,8 @@ function MainContent() {
   if (!client || !walletConnected) {
     return (
       <div style={{ margin: '0 20px' }}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: 'PT Mono',
-            fontWeight: 'bold',
-            color: '#243532',
-            marginBottom: '20px',
-          }}
-        >
-          Tip Assistant
-        </div>
+        <Title />
+
         <div
           style={{
             textAlign: 'center',
@@ -172,36 +162,13 @@ function MainContent() {
   return (
     <>
       <div className={`${isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: 'PT Mono',
-            fontWeight: 'bold',
-            color: '#243532',
-          }}
-        >
-          Tip Assistant
-        </div>
+        <Title />
         <NoAssistant />
         <PoweredByBanner />
       </div>
 
       <div className={`${!isUPSubscribedToAssistant ? 'hidden' : 'block'}`}>
-        <div
-          style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            fontFamily: 'PT Mono',
-            fontWeight: 'bold',
-            color: '#243532',
-          }}
-        >
-          Tip Assistant
-        </div>
-
+        <Title />
         <LuksoProfile
           address={destinationAddress}
           percentageTipped={percentageTipped}
