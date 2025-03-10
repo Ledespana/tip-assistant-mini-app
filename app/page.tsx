@@ -105,7 +105,7 @@ function MainContent() {
   };
 
   useEffect(() => {
-    if (!client && !contextAccounts.length ) return;
+    if (!client && !contextAccounts.length) return;
     fetchAndUpdateAssistantConfig();
     checkURDInstalled();
   }, [contextAccounts, publicClient]);
@@ -155,44 +155,44 @@ function MainContent() {
   if (isUPSubscribedToAssistant) {
     return (
       <div>
-      <Title />
-      <LuksoProfile
-        address={destinationAddress}
-        percentageTipped={percentageTipped}
-      />
+        <Title />
+        <LuksoProfile
+          address={destinationAddress}
+          percentageTipped={percentageTipped}
+        />
 
-      {walletConnected && contextAccounts[0].toLowerCase() === accounts[0].toLowerCase() && (
-        <button
-          style={{
-            margin: '5px 0',
-            display: 'block',
-            backgroundColor: '#DB7C3D',
-            fontSize: '12px',
-            width: '100%',
-            color: '#fff',
-            padding: '2px 5px',
-            textAlign: 'center',
-            borderRadius: '5px',
-            textDecoration: 'none',
-            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-          }}
-          onClick={() => setShouldDisplaySettings(true)}
-        >
-          Settings
-        </button>
-      )}
-      <PoweredByBanner />
-    </div>
-    )
-
-    }
+        {walletConnected &&
+          contextAccounts[0].toLowerCase() === accounts[0].toLowerCase() && (
+            <button
+              style={{
+                margin: '5px 0',
+                display: 'block',
+                backgroundColor: '#DB7C3D',
+                fontSize: '12px',
+                width: '100%',
+                color: '#fff',
+                padding: '2px 5px',
+                textAlign: 'center',
+                borderRadius: '5px',
+                textDecoration: 'none',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+              }}
+              onClick={() => setShouldDisplaySettings(true)}
+            >
+              Settings
+            </button>
+          )}
+        <PoweredByBanner />
+      </div>
+    );
+  }
 
   //if Assistant is not configured, or URD is not configured and no wallet
   return (
     <>
-    return (
+      return (
       <div
         style={{
           margin: '0 20px',
@@ -215,13 +215,13 @@ function MainContent() {
               The Executive Assistant that automatically channels your receiving
               LYX transaction to tip third party UP accounts.
             </p>
-            <br/>
+            <br />
             <p>Connect your wallet to continue.</p>
           </div>
           <PoweredByBanner />
         </div>
       </div>
-    );
+      );
     </>
   );
 }

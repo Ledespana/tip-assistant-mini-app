@@ -45,12 +45,14 @@ function Settings({
   );
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
   const [displayNoSettings, setDisplayNoSettings] = useState(false);
   const [showPopover, setShowPopover] = useState(false);
 
   useEffect(() => {
-    if (accounts.length && accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()) {
+    if (
+      accounts.length &&
+      accounts[0].toLowerCase() === contextAccounts[0].toLowerCase()
+    ) {
       setDisplayNoSettings(false);
     } else {
       setDisplayNoSettings(true);
@@ -75,7 +77,6 @@ function Settings({
   const handleSave = async () => {
     if (!validateTipPercentage(tipPercentage) || !client) return;
     setIsLoading(true);
-    setSuccessMessage('');
 
     try {
       // 1) Load existing config
@@ -155,19 +156,18 @@ function Settings({
       });
 
       await publicClient.waitForTransactionReceipt({ hash: txHash });
-      setSuccessMessage('Transaction successful!');
-    } catch (error) {
-      console.error('Failed to save config:', error);
-    } finally {
       setIsLoading(false);
       onBack();
+    } catch (error) {
+      console.error('Failed to save config:', error);
+      setIsLoading(false);
     }
   };
 
   const handleDeactivateAssistant = async () => {
     if (!client) return;
+    setIsLoading(true);
     try {
-      // setIsProcessingTransaction(true);
       const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
         name,
         type,
@@ -223,11 +223,11 @@ function Settings({
       });
 
       await publicClient.waitForTransactionReceipt({ hash: txHash });
-    } catch (err: any) {
-      console.error('Error unsubscribing this assistant', err);
-    } finally {
       setIsLoading(false);
       onBack();
+    } catch (err: any) {
+      console.error('Error unsubscribing this assistant', err);
+      setIsLoading(false);
     }
   };
 
@@ -334,10 +334,6 @@ function Settings({
       {errorMessage && (
         <p style={{ color: 'red', fontSize: '12px' }}>{errorMessage}</p>
       )}
-      {successMessage && (
-        <p style={{ color: 'green', fontSize: '12px' }}>{successMessage}</p>
-      )}
-
       <button
         onClick={handleSave}
         disabled={isLoading}
