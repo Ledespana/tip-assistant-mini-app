@@ -50,7 +50,7 @@ export const NoURD = ({ onInstall }: { onInstall: () => void }) => {
 
       const signature = await client.request({
         method: 'personal_sign',
-        params: [siweMessage, userAddress],
+        params: [siweMessage, userAddress] as any,
       });
 
       const mainUPController = await verifyMessage(
