@@ -40,15 +40,12 @@ export function LuksoProfile({ address, percentageTipped }: LuksoProfileProps) {
     profileAddress: string;
     isLoading: boolean;
   }>({
-    imgUrl:
-      'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp', // todo change default files
+    imgUrl: 'https://tip-assistant-grid-app.netlify.app/default-avatar.webp',
     fullName: '',
-    background:
-      'https://tools-web-components.pages.dev/images/sample-background.jpg',
+    background: 'https://tip-assistant-grid-app.netlify.app/background.jpg',
     profileAddress: '0x1234567890111213141516171819202122232425',
     isLoading: false,
   });
-
   useEffect(() => {
     async function fetchProfileImage() {
       if (!address) return;

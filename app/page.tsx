@@ -65,13 +65,13 @@ function MainContent() {
 
       setIsURDInstalled(urdInstalled);
     } catch (error) {
+      setIsLoading(false);
       console.error('Error checking assistant installation', error);
     }
   }, [client, walletConnected, contextAccounts, chainId]);
 
   const fetchAndUpdateAssistantConfig = async () => {
     try {
-      setIsLoading(true);
       const configParams = TIP_ASSISTANT_CONFIG.map(({ name, type }) => ({
         name,
         type,
@@ -99,15 +99,23 @@ function MainContent() {
       }
     } catch (err) {
       console.error('Failed to load assistant config:', err);
-    } finally {
+      setIsLoading(false);
+    }
+  };
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      await fetchAndUpdateAssistantConfig();
+      await checkURDInstalled();
+      setIsLoading(false);
+    } catch {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
     if (!client && !contextAccounts.length) return;
-    fetchAndUpdateAssistantConfig();
-    checkURDInstalled();
+    fetchData();
   }, [contextAccounts, publicClient]);
 
   const backFromSettings = async () => {
