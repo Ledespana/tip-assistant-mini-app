@@ -9,6 +9,7 @@ URL: https://tip-assistant-grid-app.netlify.app/
 > **Table of Contents**
 >
 > - [Overview](#overview)
+> - [Demo Video](#Demo-video)
 > - [Features](#features)
 > - [Universal Assistant Protocol (UAP) Background](#universal-assistant-protocol-uap-background)
 > - [Installation](#installation)
@@ -24,6 +25,8 @@ URL: https://tip-assistant-grid-app.netlify.app/
 ## Overview
 
 In a typical LUKSO Universal Profile (UP), you can receive various tokens (e.g., LYX) or other assets. The **Tip Assistant** is a simple, automated mini-contract (an **Executive Assistant**) that intercepts every incoming LYX transfer and sends a user-defined percentage to any desired third-party address. This is particularly useful for creators, collaborative projects, or any scenario where you want to consistently tip a beneficiary.
+
+**## Demo Video **
 
 [![Video Thumbnail](https://img.youtube.com/vi/JOibZqxu1jY/0.jpg)](https://www.youtube.com/watch?v=JOibZqxu1jY)
 
