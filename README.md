@@ -1,5 +1,7 @@
 # Tip Assistant
 
+![Title](https://i.ibb.co/FLFcQgFf/Screenshot-2025-03-11-at-11-30-48-AM.png)
+
 An **Executive Assistant** built on the **Universal Assistant Protocol (UAP)** for the [LUKSO](https://lukso.network) GRID. The Tip Assistant automatically redirects a percentage of incoming LYX transfers from a Universal Profile to a specified address.
 
 > **Table of Contents**
