@@ -4,6 +4,8 @@
 
 An **Executive Assistant** built on the **Universal Assistant Protocol (UAP)** for the [LUKSO](https://lukso.network) GRID. The Tip Assistant automatically redirects a percentage of incoming LYX transfers from a Universal Profile to a specified address.
 
+URL: https://tip-assistant-grid-app.netlify.app/
+
 > **Table of Contents**
 >
 > - [Overview](#overview)
