@@ -137,7 +137,3 @@ Below are some illustrative screens you may encounter when using the Tip Assista
    By default, you can set any integer percentage from 0 to 100 (no decimals for now). Configure responsibly—very high tips may deplete your funds quickly!
 
 **Happy tipping!** If you find this assistant helpful, consider starring the repo and sharing it with the LUKSO community.
-
-```
-
-```

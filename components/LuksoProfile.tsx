@@ -74,10 +74,10 @@ export function LuksoProfile({ address, percentageTipped }: LuksoProfileProps) {
             fullName: fullName || '',
             imgUrl: profileImagesIPFS?.[0]?.url
               ? profileImagesIPFS[0].url.replace('ipfs://', IPFS_GATEWAY)
-              : 'https://i.ibb.co/Rpn1sV9T/DALL-E-2025-03-04-15-47-35-A-pixelated-cartoon-style-digital-avatar-of-a-Viking-warrior-with-a-warm.webp',
+              : 'https://tip-assistant-grid-app.netlify.app/default-avatar.webp',
             background: profileBackground?.[0]?.url
               ? profileBackground[0].url.replace('ipfs://', IPFS_GATEWAY)
-              : '',
+              : 'https://tip-assistant-grid-app.netlify.app/background.jpg',
             profileAddress: address,
             isLoading: false,
           };
