@@ -28,7 +28,7 @@ In a typical LUKSO Universal Profile (UP), you can receive various tokens (e.g.,
 - **Automatic Tipping**: For every incoming LYX transaction, automatically tip a configurable percentage (e.g., 2%) to a designated address.
 - **Simple UI**: A straightforward user interface for Grid owners to install, configure, or remove the Tip Assistant.
 - **Visitor View**: Shows visitors the current info on a given Universal Profile.
-- **Seamless Integration**: Built on top of the [UAP (Universal Assistant Protocol)](#universal-assistant-protocol-uap-background).
+- **Seamless Integration**: Built on top of the UAP (Universal Assistant Protocol).
 
 ## Universal Assistant Protocol (UAP) Background
 
