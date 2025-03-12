@@ -11,9 +11,9 @@ export const getAssistantAddress = (chainId: number): string => {
 };
 
 export const urdProtocolAddressMainnet =
-  '0xdbdf20705491e524ebd77957eed2c41ec9d7e5dc';
+  '0x2BB77E952f44cF4707E312c5e0c425ca066F4C2d';
 export const urdProtocolAddressTestnet =
-  '0xcf44a050c9b1fc87141d77b646436443bdc05a2b';
+  '0x3C9b2f2F301962674314cC029f56b118bCDccbfd';
 
 export const getURDProtocolAddress = (chainId: number): string => {
   return chainId === 42 ? urdProtocolAddressMainnet : urdProtocolAddressTestnet;
