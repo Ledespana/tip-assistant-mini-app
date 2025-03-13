@@ -30,7 +30,6 @@ In a typical LUKSO Universal Profile (UP), you can receive various tokens (e.g.,
 
 [![Video Thumbnail](https://img.youtube.com/vi/JOibZqxu1jY/0.jpg)](https://www.youtube.com/watch?v=JOibZqxu1jY)
 
-
 ## Features
 
 - **Automatic Tipping**: For every incoming LYX transaction, automatically tip a configurable percentage (e.g., 2%) to a designated address.
